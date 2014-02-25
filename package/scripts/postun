@@ -1,0 +1,2 @@
+echo "Finishing removal"
+rm -r -f /opt/cloudconductor-agent/

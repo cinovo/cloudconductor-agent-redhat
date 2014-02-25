@@ -1,0 +1,9 @@
+echo "Running post install routine"
+if [ $1 -eq 1 ]; then
+	chkconfig --add cloudconductor-agent
+	chkconfig cloudconductor-agent on
+fi
+
+if [ $1 -eq 2 ]; then
+	service cloudconductor-agent start
+fi

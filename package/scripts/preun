@@ -1,0 +1,4 @@
+if [ $1 -eq 0 ]; then
+	service cloudconductor-agent stop
+	chkconfig --del cloudconductor-agent
+fi

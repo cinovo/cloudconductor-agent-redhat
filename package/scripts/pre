@@ -1,0 +1,4 @@
+echo "Preparing install"
+if [ $1 -eq 2 ]; then
+	service cloudconductor-agent stop
+fi
