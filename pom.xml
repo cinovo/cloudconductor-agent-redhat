@@ -1,6 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>oss-parent</artifactId>
+		<groupId>org.sonatype.oss</groupId>
+		<version>7</version>
+	</parent>
 	<groupId>de.cinovo.cloudconductor</groupId>
 	<artifactId>cloudconductor-agent-redhat</artifactId>
 	<version>2.6-SNAPSHOT</version>
@@ -31,17 +36,6 @@
 		<developerConnection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-	<distributionManagement>
-		<!-- Switch to maven central -->
-		<repository>
-			<id>nexus</id>
-			<url>http://nexus.cinovo.de/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus-snapshot</id>
-			<url>http://nexus.cinovo.de/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<developers>
 		<developer>
 			<id>psigloch</id>
@@ -142,36 +136,6 @@
 						</pluginExecutions>
 					</lifecycleMappingMetadata>
 				</configuration>
-			</plugin>
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
