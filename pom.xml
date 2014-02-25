@@ -19,21 +19,16 @@
 		</license>
 	</licenses>
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.cinovo.de</url>
-		<!-- switch to Travis -->
-		<!-- <url>https://travis-ci.org/</url> -->
+		<system>Travis</system>
+		<url>https://travis-ci.org/</url>
 	</ciManagement>
 	<issueManagement>
 		<system>Github</system>
 		<url>https://github.com/cinovo/cloudconductor-agent-redhat/issues</url>
 	</issueManagement>
 	<scm>
-		<connection>scm:git:ssh://git@git.cinovo.de/srv/repos/git/daemons/deploy-nodeagent.git</connection>
-		<developerConnection>scm:git:ssh://git@git.cinovo.de/srv/repos/git/daemons/deploy-nodeagent.git</developerConnection>
-		<!-- Switch to github -->
-		<!-- <connection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</connection> -->
-		<!-- <developerConnection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</developerConnection> -->
+		<connection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</connection>
+		<developerConnection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
@@ -183,18 +178,10 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.4.2</version>
 				<configuration>
-					<goals>deploy resources:copy-resources</goals>
+					<preparationGoals>clean verify rpm:rpm</preparationGoals>
+					<goals>deploy rpm:rpm resources:copy-resources</goals>
 					<scmCommentPrefix>[maven-release-plugin ${project.artifactId}]</scmCommentPrefix>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.2</version>
-				<configuration>
-					<xmlOutput>true</xmlOutput>
-					<excludeFilterFile>http://10.10.10.45/qs/findbugs/findbugs_exclude.xml</excludeFilterFile>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -220,14 +207,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
 				<version>2.1-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>verify</phase>
-						<goals>
-							<goal>rpm</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<name>${serviceName}</name>
 					<vendor>Cinovo AG</vendor>
