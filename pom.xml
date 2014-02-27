@@ -238,6 +238,18 @@
 								</source>
 							</sources>
 						</mapping>
+						<mapping>
+							<directory>/opt/${serviceName}</directory>
+							<filemode>755</filemode>
+							<username>root</username>
+							<groupname>root</groupname>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>package/env.sh</location>
+								</source>
+							</sources>
+						</mapping>
 					</mappings>
 					<preinstallScriptlet>
 						<scriptFile>package/scripts/pre</scriptFile>
