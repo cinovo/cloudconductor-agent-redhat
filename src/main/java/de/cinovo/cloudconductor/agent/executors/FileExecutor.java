@@ -20,7 +20,6 @@ package de.cinovo.cloudconductor.agent.executors;
  * #L%
  */
 
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -80,22 +79,27 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			}
 			HashCode serverFileHash = this.getChecksum(serverFile);
 			
-			if (serverFileHash.equals(localFileHash)) {
-				continue;
-			}
-			try {
-				Files.write(serverFile, localFile, Charset.forName("UTF-8"));
-			} catch (IOException e) {
-				// add error to exception list
-				this.errors.append("Failed to write file: " + localFile.getAbsolutePath());
-				this.errors.append(System.lineSeparator());
-				// just skip this file
-				continue;
+			boolean changeOccured = false;
+			
+			if (!serverFileHash.equals(localFileHash)) {
+				try {
+					Files.write(serverFile, localFile, Charset.forName("UTF-8"));
+					changeOccured = true;
+				} catch (IOException e) {
+					// add error to exception list
+					this.errors.append("Failed to write file: " + localFile.getAbsolutePath());
+					this.errors.append(System.lineSeparator());
+					// just skip this file
+					continue;
+				}
 			}
 			
 			// set file owner and group
 			try {
-				FileHelper.chown(localFile, file.getOwner(), file.getGroup());
+				if (!FileHelper.isFileOwner(localFile, file.getOwner(), file.getGroup())) {
+					FileHelper.chown(localFile, file.getOwner(), file.getGroup());
+					changeOccured = true;
+				}
 			} catch (IOException e) {
 				this.errors.append("Failed to set user and/or group for file: " + localFile.getAbsolutePath());
 				this.errors.append(System.lineSeparator());
@@ -103,14 +107,18 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			
 			// set file mode
 			try {
-				FileHelper.chmod(localFile, this.chmodToSet(file.getFileMode()));
+				String fileMode = this.fileModeIntToString(file.getFileMode());
+				if (!FileHelper.isFileMode(localFile, fileMode)) {
+					FileHelper.chmod(localFile, fileMode);
+					changeOccured = true;
+				}
 			} catch (IOException e) {
 				this.errors.append("Failed to set chmod for file: " + localFile.getAbsolutePath());
 				this.errors.append(System.lineSeparator());
 			}
 			
 			// set services to restart
-			if (file.isReloadable()) {
+			if (file.isReloadable() && changeOccured) {
 				this.restart.addAll(file.getDependentServices());
 			}
 		}
@@ -121,8 +129,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		return this;
 	}
 	
-	private String chmodToSet(String mod) {
-		
+	private String fileModeIntToString(String mod) {
 		char[] str;
 		if (mod.length() > 3) {
 			str = mod.substring(1, 3).toCharArray();

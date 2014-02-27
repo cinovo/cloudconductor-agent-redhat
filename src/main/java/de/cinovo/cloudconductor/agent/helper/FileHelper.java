@@ -20,7 +20,6 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -85,16 +84,60 @@ public class FileHelper {
 	}
 	
 	/**
+	 * @param localFile the local file
+	 * @return the file attribute view
+	 */
+	public static PosixFileAttributeView getFileAttributes(File localFile) {
+		Path localFilePath = Paths.get(localFile.getAbsolutePath());
+		return java.nio.file.Files.getFileAttributeView(localFilePath, PosixFileAttributeView.class);
+	}
+	
+	/**
+	 * Check if a file has a specific file mode or not
+	 * 
+	 * @param file the file to check
+	 * @param fileMode the file mode to check
+	 * @return file mode is equal or not
+	 * @throws IOException on error
+	 */
+	public static boolean isFileMode(File file, String fileMode) throws IOException {
+		PosixFileAttributeView view = FileHelper.getFileAttributes(file);
+		Set<PosixFilePermission> fileModeSet = PosixFilePermissions.fromString(fileMode);
+		if (view.readAttributes().permissions().equals(fileModeSet)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks whether a files owner and group are correct
+	 * 
+	 * @param file the file to check
+	 * @param owner the owner
+	 * @param group the group
+	 * @return owner and group of file are correct or not
+	 * @throws IOException on error
+	 */
+	public static boolean isFileOwner(File file, String owner, String group) throws IOException {
+		PosixFileAttributeView view = FileHelper.getFileAttributes(file);
+		if (!view.readAttributes().owner().getName().equals(owner)) {
+			return false;
+		}
+		if (!view.readAttributes().group().getName().equals(group)) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * @param localFile the local file to use chown on
 	 * @param owner the file owner to set
 	 * @param group the file group to set
 	 * @throws IOException if chown couldn't be edited
 	 */
 	public static void chown(File localFile, String owner, String group) throws IOException {
-		Path localFilePath = Paths.get(localFile.getAbsolutePath());
-		
+		PosixFileAttributeView view = FileHelper.getFileAttributes(localFile);
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
-		PosixFileAttributeView view = java.nio.file.Files.getFileAttributeView(localFilePath, PosixFileAttributeView.class);
 		UserPrincipal fileOwner = lookupService.lookupPrincipalByName(owner);
 		GroupPrincipal fileGroup = lookupService.lookupPrincipalByGroupName(group);
 		view.setOwner(fileOwner);
@@ -107,9 +150,8 @@ public class FileHelper {
 	 * @throws IOException if chmod couldn't be edited
 	 */
 	public static void chmod(File localFile, String fileMode) throws IOException {
-		Path localFilePath = Paths.get(localFile.getAbsolutePath());
+		PosixFileAttributeView view = FileHelper.getFileAttributes(localFile);
 		Set<PosixFilePermission> fileModeSet = PosixFilePermissions.fromString(fileMode);
-		PosixFileAttributeView view = java.nio.file.Files.getFileAttributeView(localFilePath, PosixFileAttributeView.class);
 		view.setPermissions(fileModeSet);
 	}
 	
