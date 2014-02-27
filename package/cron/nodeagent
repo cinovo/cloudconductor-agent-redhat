@@ -1,0 +1,1 @@
+*/5 * * * * root /sbin/service nodeagent start > /dev/null 2>&1
