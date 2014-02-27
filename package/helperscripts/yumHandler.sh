@@ -68,7 +68,7 @@ do
 done
 
 if [ ! -z "$delete_str" ]; then
-	yum -y --enablerepo=$REPO remove $delete_str &>errorlog
+	yum -y --enablerepo=$REPO remove $delete_str &>log/yumError.log
 	grepecho "DELETE"
 fi
 
@@ -78,7 +78,7 @@ do
         install_str="$install_str $element"
 done
 if [ ! -z "$install_str" ]; then
-	yum -y --enablerepo=$REPO install $install_str &>errorlog
+	yum -y --enablerepo=$REPO install $install_str &>log/yumError.log
 	grepecho "INSTALL"
 fi
 
@@ -88,7 +88,7 @@ do
         update_str="$update_str $element"
 done
 if [ ! -z "$update_str" ]; then
-	yum -y --enablerepo=$REPO update $update_str &>errorlog
+	yum -y --enablerepo=$REPO update $update_str &>log/yumError.log
 	grepecho "UPDATE"
 fi
 
