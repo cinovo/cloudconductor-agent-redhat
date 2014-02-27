@@ -40,7 +40,7 @@ eoe() {
 }
 
 grepEchoDef() {
-	local msg=$(grep "$2" errorlog)
+	local msg=$(grep "$2" log/yumError.log)
         if [ ! -z "$msg" ]; then
         	echo "$1 : $msg" 1>&2
         fi
@@ -92,5 +92,4 @@ if [ ! -z "$update_str" ]; then
 	grepecho "UPDATE"
 fi
 
-#rm -f errorlog
 exit 0;
