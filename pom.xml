@@ -292,7 +292,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>/yum/srv/cinovo</outputDirectory>
+							<outputDirectory>/yum/srv/s3-yum.cloudconductor.net</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/target/rpm/${serviceName}/RPMS/noarch/</directory>
