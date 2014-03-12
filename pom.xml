@@ -258,7 +258,7 @@
 							<directoryIncluded>false</directoryIncluded>
 							<sources>
 								<source>
-									<location>package/cron/nodeagent</location>
+									<location>package/cron/cloudconductor-agent</location>
 								</source>
 							</sources>
 						</mapping>
