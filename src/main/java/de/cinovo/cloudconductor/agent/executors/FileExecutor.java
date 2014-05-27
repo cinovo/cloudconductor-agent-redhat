@@ -83,6 +83,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			
 			if (!serverFileHash.equals(localFileHash)) {
 				try {
+					Files.createParentDirs(localFile);
 					Files.write(serverFile, localFile, Charset.forName("UTF-8"));
 					changeOccured = true;
 				} catch (IOException e) {
