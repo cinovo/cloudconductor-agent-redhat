@@ -8,9 +8,9 @@ package de.cinovo.cloudconductor.agent;
  * %%
  * Licensed under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
@@ -18,36 +18,32 @@ package de.cinovo.cloudconductor.agent;
  */
 
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.velocity.VelocityContext;
 
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
+import de.cinovo.cloudconductor.api.model.AgentOptions;
 import de.taimos.daemon.DaemonStarter;
 
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- * 
+ *
  * @author psigloch
- * 
+ *
  */
 public class AgentState {
 	
-	/**
-	 * Executor Service used for jobs
-	 */
-	public static final ScheduledExecutorService ses = Executors.newScheduledThreadPool(10);
 	/** a write lock for jobs */
 	public static final Lock executionLock = new ReentrantLock();
 	
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
-	
-	
+	private static AgentOptions options;
+
+
 	/**
 	 * @return the agent state instance
 	 */
@@ -114,5 +110,19 @@ public class AgentState {
 	 */
 	public String getServer() {
 		return this.cloudconductor;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public static AgentOptions getOptions() {
+		return AgentState.options;
+	}
+
+	/**
+	 * @param options the options to set
+	 */
+	public static void setOptions(AgentOptions options) {
+		AgentState.options = options;
 	}
 }

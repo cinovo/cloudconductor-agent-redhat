@@ -8,9 +8,9 @@ package de.cinovo.cloudconductor.agent.helper;
  * %%
  * Licensed under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
@@ -31,7 +31,9 @@ import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.lib.manager.AgentHandler;
+import de.cinovo.cloudconductor.api.lib.manager.ConfigFileHandler;
 import de.cinovo.cloudconductor.api.lib.manager.ConfigValueHandler;
+import de.cinovo.cloudconductor.api.model.AgentOptions;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
@@ -44,20 +46,21 @@ import de.cinovo.cloudconductor.api.model.Template;
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- * 
+ *
  * @author psigloch
- * 
+ *
  */
 public class ServerCom {
-	
+
 	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer());
 	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer());
-	
-	
+	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer());
+
+
 	private ServerCom() {
 		// prevent instantiation
 	}
-	
+
 	/**
 	 * @return the template for this agent
 	 * @throws CloudConductorException error if retrieval fails
@@ -69,7 +72,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @return the config for this agent
 	 * @throws CloudConductorException error if retrieval fails
@@ -81,7 +84,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @return the yum repo path
 	 * @throws CloudConductorException error if retrieval fails
@@ -94,10 +97,10 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @return the services of the host
-	 * @throws CloudConductorException thrown if communication with config server failed
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static Set<Service> getServices() throws CloudConductorException {
 		try {
@@ -107,11 +110,11 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @param cf the file
 	 * @return the data
-	 * @throws CloudConductorException thrown if communication with config server failed
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 * @throws TransformationErrorException error on generating the localized config file
 	 */
 	public static String getFileData(ConfigFile cf) throws CloudConductorException, TransformationErrorException {
@@ -133,10 +136,10 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @return the ssh keys
-	 * @throws CloudConductorException thrown if communication with config server failed
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static Set<SSHKey> getSSHKeys() throws CloudConductorException {
 		try {
@@ -146,11 +149,11 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @param req the service update req
 	 * @return the response
-	 * @throws CloudConductorException thrown if communication with config server failed
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static ServiceStatesChanges notifyRunningServices(ServiceStates req) throws CloudConductorException {
 		try {
@@ -161,17 +164,56 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * @param installedPackages the installed packages
 	 * @return the response
-	 * @throws CloudConductorException thrown if communication with config server failed
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static PackageStateChanges notifyInstalledPackages(PackageState installedPackages) throws CloudConductorException {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
 			return ServerCom.agent.notifyPackageState(template, host, installedPackages);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+
+	/**
+	 * @return the response
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
+	 */
+	public static AgentOptions heartBeat() throws CloudConductorException {
+		try {
+			String template = AgentState.info().getTemplate();
+			String host = AgentState.info().getHost();
+			return ServerCom.agent.heartBeat(template, host);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * @return the response
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
+	 */
+	public static Set<ConfigFile> getFiles() throws CloudConductorException {
+		try {
+			String template = AgentState.info().getTemplate();
+			return ServerCom.file.getConfigFilesByTemplate(template);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * @return the response
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
+	 */
+	public static boolean isServerAlive() throws CloudConductorException {
+		try {
+			return ServerCom.agent.isServerAlive();
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}

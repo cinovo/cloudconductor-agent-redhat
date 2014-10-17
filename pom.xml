@@ -66,7 +66,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.5</slf4j.version>
-		<cloudconductor.version>2.3</cloudconductor.version>
+		<cloudconductor.api.version>2.9-SNAPSHOT</cloudconductor.api.version>
 		<serviceName>cloudconductor-agent</serviceName>
 	</properties>
 	<dependencies>
@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>de.cinovo.cloudconductor</groupId>
 			<artifactId>cloudconductor-api</artifactId>
-			<version>${cloudconductor.version}</version>
+			<version>${cloudconductor.api.version}</version>
 		</dependency>
 
 		<dependency>

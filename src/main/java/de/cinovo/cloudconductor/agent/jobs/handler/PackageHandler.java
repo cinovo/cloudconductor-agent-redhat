@@ -1,4 +1,4 @@
-package de.cinovo.cloudconductor.agent.jobs;
+package de.cinovo.cloudconductor.agent.jobs.handler;
 
 /*
  * #%L
