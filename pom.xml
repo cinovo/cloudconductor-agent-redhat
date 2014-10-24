@@ -179,11 +179,6 @@
 					<copyright>2012, Cinovo AG</copyright>
 					<group>Applications/System</group>
 					<prefix>/</prefix>
-					<!-- Use github issues -->
-					<!-- <changelogFile>target/redmine/rpm-changelog</changelogFile> -->
-					<requires>
-						<require>jdk &gt;= 1.7</require>
-					</requires>
 					<mappings>
 						<mapping>
 							<directory>/etc/init.d</directory>
