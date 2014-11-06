@@ -8,9 +8,9 @@ package de.cinovo.cloudconductor.agent;
  * %%
  * Licensed under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
@@ -29,26 +29,24 @@ import de.cinovo.cloudconductor.agent.helper.AgentVars;
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.AgentJob;
-import de.cinovo.cloudconductor.agent.jobs.AuhtorizedKeysJob;
-import de.cinovo.cloudconductor.agent.jobs.DefaultJob;
+import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import de.cinovo.cloudconductor.api.lib.helper.SchedulerService;
 import de.cinovo.cloudconductor.api.model.Template;
 import de.taimos.daemon.DaemonLifecycleAdapter;
 
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- * 
+ *
  * @author psigloch
- * 
+ *
  */
 public final class NodeAgent extends DaemonLifecycleAdapter {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeAgent.class);
-	
-	private static final AgentJob[] timedJobs = new AgentJob[] {new DefaultJob(), new AuhtorizedKeysJob()};
-	
-	
+
+
 	/** Constructor */
 	public NodeAgent() {
 		try {
@@ -61,12 +59,20 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 			}
 		} catch (ServerConnectionException e) {
 			// this is still before the logger gets initialized
-			System.err.println("The given Template is not known by the server. Please check the Template");
+			System.err.println("The Template " + AgentState.info().getTemplate() + " is not known by the server. I have no work to do. Quitting...");
 			System.exit(1);
 		}
 	}
 	
 	private boolean checkServer() throws ServerConnectionException {
+		try {
+			ServerCom.isServerAlive();
+		} catch (CloudConductorException e) {
+			// this is still before the logger gets initialized
+			System.err.println("Initial server connection failed! Waiting for server and retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
+			return false;
+		}
+
 		try {
 			Template template = ServerCom.getTemplate();
 			if (template != null) {
@@ -74,9 +80,7 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 			}
 			throw new ServerConnectionException();
 		} catch (CloudConductorException e) {
-			// this is still before the logger gets initialized
-			System.err.println("Initial server connection failed! Retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
-			return false;
+			throw new ServerConnectionException();
 		}
 	}
 	
@@ -108,14 +112,25 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	@Override
 	public void started() {
 		// start timed jobs
-		for (AgentJob job : NodeAgent.timedJobs) {
-			AgentState.ses.scheduleAtFixedRate(job, job.getInititalDelay(), job.getRepeatTimer(), job.getRepeatTimerUnit());
+		for (Class<AgentJob> jobClazz : OptionHandler.jobRegistry) {
+			AgentJob job;
+			try {
+				job = jobClazz.newInstance();
+				if (job.isDefaultStart()) {
+					SchedulerService.instance.register(job.getJobIdentifier(), job, job.defaultStartTimer(), job.defaultStartTimerUnit());
+				} else {
+					SchedulerService.instance.register(job.getJobIdentifier(), job);
+				}
+			} catch (InstantiationException | IllegalAccessException e) {
+				NodeAgent.LOGGER.error("Couldn't start job: " + jobClazz.getName(), e);
+			}
+			
 		}
 	}
 	
 	@Override
 	public void doStop() throws Exception {
-		AgentState.ses.shutdown();
+		SchedulerService.instance.shutdown();
 		super.doStop();
 	}
 }

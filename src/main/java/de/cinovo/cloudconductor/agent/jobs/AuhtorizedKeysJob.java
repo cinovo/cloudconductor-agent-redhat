@@ -9,9 +9,9 @@ package de.cinovo.cloudconductor.agent.jobs;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ package de.cinovo.cloudconductor.agent.jobs;
  * limitations under the License.
  * #L%
  */
-
 
 import java.io.IOException;
 import java.util.Set;
@@ -36,12 +35,15 @@ import de.cinovo.cloudconductor.api.model.SSHKey;
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- * 
+ *
  * @author psigloch
- * 
+ *
  */
 public class AuhtorizedKeysJob implements AgentJob {
 	
+	/** the job name, used by scheduler */
+	public static final String JOB_NAME = "AUTHORIZED_KEYS";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuhtorizedKeysJob.class);
 	
 	
@@ -64,18 +66,22 @@ public class AuhtorizedKeysJob implements AgentJob {
 	}
 	
 	@Override
-	public long getInititalDelay() {
+	public String getJobIdentifier() {
+		return AuhtorizedKeysJob.JOB_NAME;
+	}
+	
+	@Override
+	public boolean isDefaultStart() {
+		return false;
+	}
+	
+	@Override
+	public long defaultStartTimer() {
 		return 0;
 	}
 	
 	@Override
-	public long getRepeatTimer() {
-		return 5;
+	public TimeUnit defaultStartTimerUnit() {
+		return null;
 	}
-	
-	@Override
-	public TimeUnit getRepeatTimerUnit() {
-		return TimeUnit.MINUTES;
-	}
-	
 }
