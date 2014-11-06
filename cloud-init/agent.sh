@@ -13,4 +13,4 @@ export CLOUDCONDUCTOR_URL=$CLOUDCONDUCTOR_URL
 export TEMPLATE_NAME=$TEMPLATE_NAME
 EOF
 
-service cloudconductor start
+service cloudconductor-agent start
