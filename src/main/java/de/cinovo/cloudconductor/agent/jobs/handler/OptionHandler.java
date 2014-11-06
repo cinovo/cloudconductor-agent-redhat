@@ -17,27 +17,32 @@ import de.cinovo.cloudconductor.api.model.AgentOptions;
  *
  */
 public class OptionHandler {
-	
+
 	/** existing jobs */
 	@SuppressWarnings("unchecked")
 	public static final Class<AgentJob>[] jobRegistry = new Class[] {DefaultJob.class, AuhtorizedKeysJob.class, FilesJob.class, HeartBeatJob.class};
-	
+
 	private AgentOptions newOptions;
-
-
+	
+	
 	/**
 	 * @param newOptions the new options to use
 	 */
 	public OptionHandler(AgentOptions newOptions) {
 		this.newOptions = newOptions;
 	}
-	
+
 	/**
 	 */
 	public void run() {
 		AgentOptions oldOptions = AgentState.getOptions();
 		AgentState.setOptions(this.newOptions);
-		
+
+		// option timer
+		if ((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || (this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
+			SchedulerService.instance.resetTask(HeartBeatJob.JOB_NAME, this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
+		}
+
 		// SSH KEYS
 		switch (this.newOptions.getDoSshKeys()) {
 		case OFF:
@@ -48,12 +53,12 @@ public class OptionHandler {
 			SchedulerService.instance.executeOnce(AuhtorizedKeysJob.JOB_NAME);
 			break;
 		case REPEAT:
-			if ((this.newOptions.getSshKeysTimer() != oldOptions.getSshKeysTimer()) || (this.newOptions.getSshKeysTimerUnit() != oldOptions.getSshKeysTimerUnit())) {
+			if ((oldOptions == null) || (this.newOptions.getSshKeysTimer() != oldOptions.getSshKeysTimer()) || (this.newOptions.getSshKeysTimerUnit() != oldOptions.getSshKeysTimerUnit())) {
 				SchedulerService.instance.resetTask(AuhtorizedKeysJob.JOB_NAME, this.newOptions.getSshKeysTimer(), this.newOptions.getSshKeysTimerUnit());
 			}
 			break;
 		}
-		
+
 		// FILE MANAGEMENT
 		switch (this.newOptions.getDoFileManagement()) {
 		case OFF:
@@ -64,12 +69,12 @@ public class OptionHandler {
 			SchedulerService.instance.executeOnce(FilesJob.JOB_NAME);
 			break;
 		case REPEAT:
-			if ((this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
+			if ((oldOptions == null) || (this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
 				SchedulerService.instance.resetTask(FilesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
 			}
 			break;
 		}
-		
+
 		// PACKAGE MANAGEMENT
 		switch (this.newOptions.getDoPackageManagement()) {
 		case OFF:
@@ -80,7 +85,7 @@ public class OptionHandler {
 			SchedulerService.instance.executeOnce(DefaultJob.JOB_NAME);
 			break;
 		case REPEAT:
-			if ((this.newOptions.getPackageManagementTimer() != oldOptions.getPackageManagementTimer()) || (this.newOptions.getPackageManagementTimerUnit() != oldOptions.getPackageManagementTimerUnit())) {
+			if ((oldOptions == null) || (this.newOptions.getPackageManagementTimer() != oldOptions.getPackageManagementTimer()) || (this.newOptions.getPackageManagementTimerUnit() != oldOptions.getPackageManagementTimerUnit())) {
 				SchedulerService.instance.resetTask(DefaultJob.JOB_NAME, this.newOptions.getPackageManagementTimer(), this.newOptions.getPackageManagementTimerUnit());
 			}
 			break;
