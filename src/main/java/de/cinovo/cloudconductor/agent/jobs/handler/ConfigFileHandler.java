@@ -22,21 +22,23 @@ import de.cinovo.cloudconductor.api.model.ConfigFile;
  */
 public class ConfigFileHandler {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceHandler.class);
-
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFileHandler.class);
+	
+	
 	/**
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
+		ConfigFileHandler.LOGGER.debug("Start Config File Handler");
 		Set<ConfigFile> configFiles;
 		try {
 			configFiles = ServerCom.getFiles();
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
-
+		
 		// handle files
+		ConfigFileHandler.LOGGER.debug("Handle files");
 		IExecutor<Set<String>> files = new FileExecutor(configFiles);
 		try {
 			files.execute();
@@ -44,10 +46,11 @@ public class ConfigFileHandler {
 			// just log the error but go on with execution
 			ConfigFileHandler.LOGGER.error(e.getMessage());
 		}
-
+		
 		Set<String> servicesToRestart = files.getResult();
 		if ((servicesToRestart != null) && !servicesToRestart.isEmpty()) {
 			// handle restart of services
+			ConfigFileHandler.LOGGER.debug("Restart services");
 			ScriptExecutor serviceHandler = ScriptExecutor.generateServiceStateHandler(servicesToRestart, null, null);
 			try {
 				serviceHandler.execute();
@@ -56,5 +59,6 @@ public class ConfigFileHandler {
 				ConfigFileHandler.LOGGER.error(e.getMessage());
 			}
 		}
+		ConfigFileHandler.LOGGER.debug("Finished Config File Handler");
 	}
 }

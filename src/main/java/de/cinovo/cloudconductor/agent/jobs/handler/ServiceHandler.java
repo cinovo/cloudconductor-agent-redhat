@@ -41,14 +41,16 @@ import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
  *
  */
 public class ServiceHandler {
-
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceHandler.class);
-
-
+	
+	
 	/**
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
+		ServiceHandler.LOGGER.debug("Start Service Handler");
+		ServiceHandler.LOGGER.debug("Report running services");
 		List<String> runningServices = this.collectRunningServices();
 		ServiceStates req = new ServiceStates(runningServices);
 		ServiceStatesChanges serviceChanges;
@@ -57,8 +59,9 @@ public class ServiceHandler {
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
-
+		
 		// handle service changes
+		ServiceHandler.LOGGER.debug("Handle service changes");
 		ScriptExecutor serviceHandler = ScriptExecutor.generateServiceStateHandler(serviceChanges.getToRestart(), serviceChanges.getToStart(), serviceChanges.getToStop());
 		try {
 			serviceHandler.execute();
@@ -66,8 +69,9 @@ public class ServiceHandler {
 			// just log the error but go on with execution
 			ServiceHandler.LOGGER.error(e.getMessage());
 		}
-
+		
 		// notify server on current state
+		ServiceHandler.LOGGER.debug("Report running services again");
 		runningServices = this.collectRunningServices();
 		req = new ServiceStates(runningServices);
 		try {
@@ -75,8 +79,9 @@ public class ServiceHandler {
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
+		ServiceHandler.LOGGER.debug("Finished service handler");
 	}
-
+	
 	private List<String> collectRunningServices() throws ExecutionError {
 		Set<Service> services = null;
 		try {
@@ -84,7 +89,7 @@ public class ServiceHandler {
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
-
+		
 		List<String> runningServices = new ArrayList<String>();
 		ScriptExecutor serviceStateHandler = ScriptExecutor.generateCheckServiceState(services);
 		serviceStateHandler.execute();
@@ -93,7 +98,7 @@ public class ServiceHandler {
 				runningServices.add(s.next().trim());
 			}
 		}
-
+		
 		return runningServices;
 	}
 }

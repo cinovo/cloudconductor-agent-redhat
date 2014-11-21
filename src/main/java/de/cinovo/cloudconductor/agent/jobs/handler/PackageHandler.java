@@ -19,6 +19,9 @@ package de.cinovo.cloudconductor.agent.jobs.handler;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.IExecutor;
 import de.cinovo.cloudconductor.agent.executors.InstalledPackages;
@@ -38,20 +41,29 @@ import de.cinovo.cloudconductor.api.model.PackageVersion;
  */
 public class PackageHandler {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PackageHandler.class);
+	
+	
 	/**
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
+		PackageHandler.LOGGER.debug("Start Package Handler");
 		
 		// report installed packages
+		PackageHandler.LOGGER.debug("Report installed packages");
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
 		
 		// handle package changes
+		PackageHandler.LOGGER.debug("Handle package changes");
 		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(packageChanges.getToErase(), packageChanges.getToInstall(), packageChanges.getToUpdate());
 		pkgHandler.execute();
 		
 		// re-report installed packages
+		PackageHandler.LOGGER.debug("Report installed packages again");
 		this.reportInstalledPackages();
+		
+		PackageHandler.LOGGER.debug("Finished Package Gandler");
 	}
 	
 	private PackageStateChanges reportInstalledPackages() throws ExecutionError {

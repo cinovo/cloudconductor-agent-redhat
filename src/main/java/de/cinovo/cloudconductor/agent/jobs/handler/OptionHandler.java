@@ -1,5 +1,8 @@
 package de.cinovo.cloudconductor.agent.jobs.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.jobs.AgentJob;
 import de.cinovo.cloudconductor.agent.jobs.AuhtorizedKeysJob;
@@ -17,11 +20,13 @@ import de.cinovo.cloudconductor.api.model.AgentOptions;
  *
  */
 public class OptionHandler {
-
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OptionHandler.class);
+	
 	/** existing jobs */
 	@SuppressWarnings("unchecked")
 	public static final Class<AgentJob>[] jobRegistry = new Class[] {DefaultJob.class, AuhtorizedKeysJob.class, FilesJob.class, HeartBeatJob.class};
-
+	
 	private AgentOptions newOptions;
 	
 	
@@ -31,19 +36,22 @@ public class OptionHandler {
 	public OptionHandler(AgentOptions newOptions) {
 		this.newOptions = newOptions;
 	}
-
+	
 	/**
 	 */
 	public void run() {
+		OptionHandler.LOGGER.debug("Start Option Handler");
 		AgentOptions oldOptions = AgentState.getOptions();
 		AgentState.setOptions(this.newOptions);
-
+		
 		// option timer
+		OptionHandler.LOGGER.debug("Handle timer options");
 		if ((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || (this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
 			SchedulerService.instance.resetTask(HeartBeatJob.JOB_NAME, this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
 		}
-
+		
 		// SSH KEYS
+		OptionHandler.LOGGER.debug("Handle ssh keys timer option");
 		switch (this.newOptions.getDoSshKeys()) {
 		case OFF:
 			SchedulerService.instance.stop(AuhtorizedKeysJob.JOB_NAME);
@@ -58,8 +66,9 @@ public class OptionHandler {
 			}
 			break;
 		}
-
+		
 		// FILE MANAGEMENT
+		OptionHandler.LOGGER.debug("Handle file timer option");
 		switch (this.newOptions.getDoFileManagement()) {
 		case OFF:
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
@@ -74,8 +83,9 @@ public class OptionHandler {
 			}
 			break;
 		}
-
+		
 		// PACKAGE MANAGEMENT
+		OptionHandler.LOGGER.debug("Handle package timer option");
 		switch (this.newOptions.getDoPackageManagement()) {
 		case OFF:
 			SchedulerService.instance.stop(DefaultJob.JOB_NAME);
@@ -90,5 +100,6 @@ public class OptionHandler {
 			}
 			break;
 		}
+		OptionHandler.LOGGER.debug("Finished Option Handler");
 	}
 }
