@@ -49,8 +49,8 @@ public class ServiceHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		ServiceHandler.LOGGER.debug("Start Service Handler");
-		ServiceHandler.LOGGER.debug("Report running services");
+		ServiceHandler.LOGGER.debug("Start ServiceHandler");
+		ServiceHandler.LOGGER.debug("ServiceHandler : Report running services");
 		List<String> runningServices = this.collectRunningServices();
 		ServiceStates req = new ServiceStates(runningServices);
 		ServiceStatesChanges serviceChanges;
@@ -61,7 +61,7 @@ public class ServiceHandler {
 		}
 		
 		// handle service changes
-		ServiceHandler.LOGGER.debug("Handle service changes");
+		ServiceHandler.LOGGER.debug("ServiceHandler: Handle service changes");
 		ScriptExecutor serviceHandler = ScriptExecutor.generateServiceStateHandler(serviceChanges.getToRestart(), serviceChanges.getToStart(), serviceChanges.getToStop());
 		try {
 			serviceHandler.execute();
@@ -71,7 +71,7 @@ public class ServiceHandler {
 		}
 		
 		// notify server on current state
-		ServiceHandler.LOGGER.debug("Report running services again");
+		ServiceHandler.LOGGER.debug("ServiceHandler : Report running services again");
 		runningServices = this.collectRunningServices();
 		req = new ServiceStates(runningServices);
 		try {
@@ -79,7 +79,7 @@ public class ServiceHandler {
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
-		ServiceHandler.LOGGER.debug("Finished service handler");
+		ServiceHandler.LOGGER.debug("Finished ServiceHandler");
 	}
 	
 	private List<String> collectRunningServices() throws ExecutionError {

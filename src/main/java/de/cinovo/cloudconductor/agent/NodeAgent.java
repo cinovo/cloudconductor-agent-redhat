@@ -45,8 +45,8 @@ import de.taimos.daemon.DaemonLifecycleAdapter;
 public final class NodeAgent extends DaemonLifecycleAdapter {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeAgent.class);
-
-
+	
+	
 	/** Constructor */
 	public NodeAgent() {
 		try {
@@ -72,7 +72,7 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 			System.err.println("Initial server connection failed! Waiting for server and retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
 			return false;
 		}
-
+		
 		try {
 			Template template = ServerCom.getTemplate();
 			if (template != null) {
@@ -118,8 +118,10 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 				job = jobClazz.newInstance();
 				if (job.isDefaultStart()) {
 					SchedulerService.instance.register(job.getJobIdentifier(), job, job.defaultStartTimer(), job.defaultStartTimerUnit());
+					NodeAgent.LOGGER.debug("Registered " + job.getJobIdentifier() + " as defaultstart with " + job.defaultStartTimer() + ":" + job.defaultStartTimerUnit());
 				} else {
 					SchedulerService.instance.register(job.getJobIdentifier(), job);
+					NodeAgent.LOGGER.debug("Registered " + job.getJobIdentifier());
 				}
 			} catch (InstantiationException | IllegalAccessException e) {
 				NodeAgent.LOGGER.error("Couldn't start job: " + jobClazz.getName(), e);

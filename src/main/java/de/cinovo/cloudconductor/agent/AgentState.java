@@ -36,14 +36,17 @@ import de.taimos.daemon.DaemonStarter;
  */
 public class AgentState {
 	
-	/** a write lock for jobs */
-	public static final Lock executionLock = new ReentrantLock();
+	/** a write lock for package jobs */
+	public static final Lock packageExecutionLock = new ReentrantLock();
+	
+	/** a write lock for file jobs */
+	public static final Lock filesExecutionLock = new ReentrantLock();
 	
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
 	private static AgentOptions options;
-
-
+	
+	
 	/**
 	 * @return the agent state instance
 	 */
@@ -111,14 +114,14 @@ public class AgentState {
 	public String getServer() {
 		return this.cloudconductor;
 	}
-
+	
 	/**
 	 * @return the options
 	 */
 	public static AgentOptions getOptions() {
 		return AgentState.options;
 	}
-
+	
 	/**
 	 * @param options the options to set
 	 */

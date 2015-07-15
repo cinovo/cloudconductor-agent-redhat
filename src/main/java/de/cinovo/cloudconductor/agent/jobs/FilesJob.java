@@ -18,41 +18,41 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
  *
  */
 public class FilesJob implements AgentJob {
-
+	
 	/** the job name, used by scheduler */
 	public static final String JOB_NAME = "FILES_JOB";
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJob.class);
-
-
+	
+	
 	@Override
 	public void run() {
+		FilesJob.LOGGER.debug("Started FilesJob");
 		// only run if no other blocking job is currently running
-		if (AgentState.executionLock.tryLock()) {
+		if (AgentState.filesExecutionLock.tryLock()) {
 			try {
-				try {
-					new ConfigFileHandler().run();
-				} catch (ExecutionError e) {
-					if (e.getCause() instanceof CloudConductorException) {
-						FilesJob.LOGGER.error(e.getMessage(), e);
-					}
+				new ConfigFileHandler().run();
+			} catch (ExecutionError e) {
+				if (e.getCause() instanceof CloudConductorException) {
+					FilesJob.LOGGER.debug(e.getMessage(), e);
 				}
 			} finally {
-				AgentState.executionLock.unlock();
+				AgentState.filesExecutionLock.unlock();
 			}
 		}
+		FilesJob.LOGGER.debug("Started FilesJob");
 	}
-
+	
 	@Override
 	public String getJobIdentifier() {
 		return FilesJob.JOB_NAME;
 	}
-
+	
 	@Override
 	public boolean isDefaultStart() {
 		return false;
 	}
-
+	
 	@Override
 	public long defaultStartTimer() {
 		return 0;

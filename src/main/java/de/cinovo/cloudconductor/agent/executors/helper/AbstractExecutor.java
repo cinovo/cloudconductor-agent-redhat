@@ -20,7 +20,6 @@ package de.cinovo.cloudconductor.agent.executors.helper;
  * #L%
  */
 
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -59,7 +58,7 @@ public abstract class AbstractExecutor<T> implements IExecutor<T> {
 		Process p = null;
 		try {
 			p = this.genProcess();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new ExecutionError("Error generating a process.", e);
 		}
 		if (p == null) {

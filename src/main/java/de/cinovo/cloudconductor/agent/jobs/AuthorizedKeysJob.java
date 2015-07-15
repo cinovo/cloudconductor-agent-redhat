@@ -39,12 +39,12 @@ import de.cinovo.cloudconductor.api.model.SSHKey;
  * @author psigloch
  *
  */
-public class AuhtorizedKeysJob implements AgentJob {
+public class AuthorizedKeysJob implements AgentJob {
 	
 	/** the job name, used by scheduler */
 	public static final String JOB_NAME = "AUTHORIZED_KEYS";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AuhtorizedKeysJob.class);
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizedKeysJob.class);
 	
 	
 	@Override
@@ -53,21 +53,22 @@ public class AuhtorizedKeysJob implements AgentJob {
 		try {
 			sshKeys = ServerCom.getSSHKeys();
 		} catch (CloudConductorException e) {
-			AuhtorizedKeysJob.LOGGER.error("Couldn't retrieve ssh keys from server.", e);
+			AuthorizedKeysJob.LOGGER.error("Couldn't retrieve ssh keys from server.", e);
 			return;
 		}
-		
-		try {
-			FileHelper.writeRootAuthorizedKeys(sshKeys);
-		} catch (IOException e) {
-			AuhtorizedKeysJob.LOGGER.error("Couldn't write auhtorized keys for root.", e);
-			return;
+		if (!sshKeys.isEmpty()) {
+			try {
+				FileHelper.writeRootAuthorizedKeys(sshKeys);
+			} catch (IOException e) {
+				AuthorizedKeysJob.LOGGER.error("Couldn't write auhtorized keys for root.", e);
+				return;
+			}
 		}
 	}
 	
 	@Override
 	public String getJobIdentifier() {
-		return AuhtorizedKeysJob.JOB_NAME;
+		return AuthorizedKeysJob.JOB_NAME;
 	}
 	
 	@Override

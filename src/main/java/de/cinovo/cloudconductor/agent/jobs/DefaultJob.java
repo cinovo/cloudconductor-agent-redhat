@@ -39,34 +39,47 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
  *
  */
 public class DefaultJob implements AgentJob {
-
+	
 	/** the job name, used by scheduler */
 	public static final String JOB_NAME = "DEFAULT_JOB";
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJob.class);
-
-
+	
+	
 	@Override
 	public void run() {
+		DefaultJob.LOGGER.debug("Started DefaultJob");
 		// only run if no other blocking job is currently running
-		if (AgentState.executionLock.tryLock()) {
-			try {
-				try {
-					new PackageHandler().run();
-				} catch (ExecutionError e) {
-					if (e.getCause() instanceof CloudConductorException) {
-						DefaultJob.LOGGER.error(e.getMessage(), e);
-					} else {
-						DefaultJob.LOGGER.error(e.getMessage());
-					}
-				}
-				try {
-					new ServiceHandler().run();
-				} catch (ExecutionError e) {
-					DefaultJob.LOGGER.error(e.getMessage(), e);
-				}
-			} finally {
-				AgentState.executionLock.unlock();
+		if (AgentState.packageExecutionLock.tryLock()) {
+			this.handlePackages();
+			this.handleServices();
+			AgentState.packageExecutionLock.unlock();
+		}
+		DefaultJob.LOGGER.debug("Finished DefaultJob");
+	}
+	
+	private void handleServices() {
+		try {
+			ServiceHandler serviceHandler = new ServiceHandler();
+			serviceHandler.run();
+		} catch (ExecutionError e) {
+			if (e.getCause() instanceof CloudConductorException) {
+				DefaultJob.LOGGER.error(e.getMessage(), e);
+			} else {
+				DefaultJob.LOGGER.error(e.getMessage());
+			}
+		}
+	}
+	
+	private void handlePackages() {
+		try {
+			PackageHandler packageHandler = new PackageHandler();
+			packageHandler.run();
+		} catch (ExecutionError e) {
+			if (e.getCause() instanceof CloudConductorException) {
+				DefaultJob.LOGGER.error(e.getMessage(), e);
+			} else {
+				DefaultJob.LOGGER.error(e.getMessage());
 			}
 		}
 	}
@@ -80,7 +93,7 @@ public class DefaultJob implements AgentJob {
 	public boolean isDefaultStart() {
 		return false;
 	}
-
+	
 	@Override
 	public long defaultStartTimer() {
 		return 0;
