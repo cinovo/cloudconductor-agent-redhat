@@ -48,22 +48,22 @@ public class PackageHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		PackageHandler.LOGGER.debug("Start Package Handler");
+		PackageHandler.LOGGER.info("Start PackageHandler");
 		
 		// report installed packages
-		PackageHandler.LOGGER.debug("Report installed packages");
+		PackageHandler.LOGGER.info("PackageHandler : Report installed packages");
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
 		
 		// handle package changes
-		PackageHandler.LOGGER.debug("Handle package changes");
+		PackageHandler.LOGGER.info("PackageHandler : Handle package changes");
 		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(packageChanges.getToErase(), packageChanges.getToInstall(), packageChanges.getToUpdate());
 		pkgHandler.execute();
 		
 		// re-report installed packages
-		PackageHandler.LOGGER.debug("Report installed packages again");
+		PackageHandler.LOGGER.info("PackageHandler : Report installed packages again");
 		this.reportInstalledPackages();
 		
-		PackageHandler.LOGGER.debug("Finished Package Gandler");
+		PackageHandler.LOGGER.info("Finished PackageHandler");
 	}
 	
 	private PackageStateChanges reportInstalledPackages() throws ExecutionError {

@@ -18,15 +18,16 @@ import de.cinovo.cloudconductor.api.model.AgentOptions;
  *
  */
 public class HeartBeatJob implements AgentJob {
-
+	
 	/** the job name, used by scheduler */
 	public static final String JOB_NAME = "HEART_BEAT_JOB";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AuhtorizedKeysJob.class);
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizedKeysJob.class);
 	
 	
 	@Override
 	public void run() {
+		HeartBeatJob.LOGGER.debug("Starting HeartBeatJob");
 		AgentOptions newOptions;
 		try {
 			newOptions = ServerCom.heartBeat();
@@ -36,6 +37,7 @@ public class HeartBeatJob implements AgentJob {
 		}
 		
 		new OptionHandler(newOptions).run();
+		HeartBeatJob.LOGGER.debug("Finished HeartBeatJob");
 	}
 	
 	@Override
@@ -52,7 +54,7 @@ public class HeartBeatJob implements AgentJob {
 	public long defaultStartTimer() {
 		return 1;
 	}
-
+	
 	@Override
 	public TimeUnit defaultStartTimerUnit() {
 		return TimeUnit.MINUTES;
