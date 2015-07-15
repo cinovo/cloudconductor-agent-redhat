@@ -28,7 +28,7 @@ public class FilesJob implements AgentJob {
 	@Override
 	public void run() {
 		// only run if no other blocking job is currently running
-		if (AgentState.executionLock.tryLock()) {
+		if (AgentState.filesExecutionLock.tryLock()) {
 			FilesJob.LOGGER.debug("FilesJob: GOT LOCK");
 			try {
 				new ConfigFileHandler().run();
@@ -37,7 +37,7 @@ public class FilesJob implements AgentJob {
 					FilesJob.LOGGER.debug(e.getMessage(), e);
 				}
 			} finally {
-				AgentState.executionLock.unlock();
+				AgentState.filesExecutionLock.unlock();
 				FilesJob.LOGGER.debug("FilesJob: FREED LOCK");
 			}
 		} else {
