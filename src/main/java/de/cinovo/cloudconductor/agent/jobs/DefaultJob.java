@@ -48,18 +48,14 @@ public class DefaultJob implements AgentJob {
 	
 	@Override
 	public void run() {
-		DefaultJob.LOGGER.info("Started DefaultJob");
+		DefaultJob.LOGGER.debug("Started DefaultJob");
 		// only run if no other blocking job is currently running
 		if (AgentState.packageExecutionLock.tryLock()) {
-			DefaultJob.LOGGER.info("DefaultJob: GOT LOCK");
 			this.handlePackages();
 			this.handleServices();
 			AgentState.packageExecutionLock.unlock();
-			DefaultJob.LOGGER.info("DefaultJob: FREED LOCK");
-		} else {
-			DefaultJob.LOGGER.info("DefaultJob: BLOCKED LOCK");
 		}
-		DefaultJob.LOGGER.info("Finished DefaultJob");
+		DefaultJob.LOGGER.debug("Finished DefaultJob");
 	}
 	
 	private void handleServices() {
