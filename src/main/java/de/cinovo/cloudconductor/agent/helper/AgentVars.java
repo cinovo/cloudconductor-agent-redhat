@@ -49,6 +49,15 @@ public interface AgentVars {
 	public static final String TEMPLATE_PROP = "TEMPLATE_NAME";
 	
 	/**
+	 * property for the agent name
+	 */
+	public static final String AGENT_PROP = "AGENT_NAME";
+	
+	/**
+	 * property for the authentication token
+	 */
+	public static final String TOKEN_PROP = "AUTH_TOKEN";
+	/**
 	 * property for the yum repo name
 	 */
 	public static final String YUM_NAME_PROP = "nodeagent.repo.name";

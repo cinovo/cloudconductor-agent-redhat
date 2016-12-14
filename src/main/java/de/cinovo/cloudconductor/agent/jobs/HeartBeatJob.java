@@ -13,9 +13,9 @@ import de.cinovo.cloudconductor.api.model.AgentOptions;
 /**
  * Copyright 2014 Cinovo AG<br>
  * <br>
- *
+ * 
  * @author psigloch
- *
+ * 
  */
 public class HeartBeatJob implements AgentJob {
 	

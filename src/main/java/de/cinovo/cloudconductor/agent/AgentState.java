@@ -30,9 +30,9 @@ import de.taimos.daemon.DaemonStarter;
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- *
+ * 
  * @author psigloch
- *
+ * 
  */
 public class AgentState {
 	
@@ -116,6 +116,20 @@ public class AgentState {
 	}
 	
 	/**
+	 * @return the agent name of this agent
+	 */
+	public String getAgent() {
+		return System.getProperty(AgentVars.AGENT_PROP, this.getHost());
+	}
+	
+	/**
+	 * @return the token for authentication
+	 */
+	public String getToken() {
+		return System.getProperty(AgentVars.TOKEN_PROP, null);
+	}
+	
+	/**
 	 * @return the options
 	 */
 	public static AgentOptions getOptions() {
@@ -127,5 +141,19 @@ public class AgentState {
 	 */
 	public static void setOptions(AgentOptions options) {
 		AgentState.options = options;
+		AgentState.info().updateTemplate(options.getTemplateName());
 	}
+	
+	/**
+	 * updates the templatename
+	 * 
+	 * @param templateName the name of the template
+	 */
+	public void updateTemplate(String templateName) {
+		if (this.getTemplate().equals(templateName)) {
+			return;
+		}
+		System.setProperty(AgentVars.TEMPLATE_PROP, templateName);
+	}
+	
 }

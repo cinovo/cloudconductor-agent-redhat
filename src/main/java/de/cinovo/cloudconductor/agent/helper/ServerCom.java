@@ -46,21 +46,21 @@ import de.cinovo.cloudconductor.api.model.Template;
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- *
+ * 
  * @author psigloch
- *
+ * 
  */
 public class ServerCom {
-
-	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer());
-	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer());
-	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer());
-
-
+	
+	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	
+	
 	private ServerCom() {
 		// prevent instantiation
 	}
-
+	
 	/**
 	 * @return the template for this agent
 	 * @throws CloudConductorException error if retrieval fails
@@ -72,7 +72,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the config for this agent
 	 * @throws CloudConductorException error if retrieval fails
@@ -84,7 +84,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the yum repo path
 	 * @throws CloudConductorException error if retrieval fails
@@ -97,7 +97,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the services of the host
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
@@ -110,7 +110,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @param cf the file
 	 * @return the data
@@ -136,7 +136,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the ssh keys
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
@@ -149,7 +149,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @param req the service update req
 	 * @return the response
@@ -164,7 +164,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @param installedPackages the installed packages
 	 * @return the response
@@ -179,7 +179,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the response
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
@@ -188,7 +188,8 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			return ServerCom.agent.heartBeat(template, host);
+			String agentName = AgentState.info().getAgent();
+			return ServerCom.agent.heartBeat(template, host, agentName);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
