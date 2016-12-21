@@ -22,6 +22,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
 import de.cinovo.cloudconductor.api.model.AgentOptions;
@@ -45,6 +47,8 @@ public class AgentState {
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
 	private static AgentOptions options;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AgentState.class);
 	
 	
 	/**

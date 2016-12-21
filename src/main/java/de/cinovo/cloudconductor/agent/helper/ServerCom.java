@@ -52,13 +52,24 @@ import de.cinovo.cloudconductor.api.model.Template;
  */
 public class ServerCom {
 	
-	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
-	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
-	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	private static ServerCom instance;
+	
+	protected final AgentHandler agent;
+	protected final ConfigValueHandler config;
+	protected final ConfigFileHandler file;
 	
 	
 	private ServerCom() {
-		// prevent instantiation
+		this.agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+		this.config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+		this.file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	}
+	
+	private static ServerCom instance() {
+		if (ServerCom.instance == null) {
+			ServerCom.instance = new ServerCom();
+		}
+		return ServerCom.instance;
 	}
 	
 	/**
@@ -67,7 +78,7 @@ public class ServerCom {
 	 */
 	public static Template getTemplate() throws CloudConductorException {
 		try {
-			return ServerCom.agent.getTemplate(AgentState.info().getTemplate());
+			return ServerCom.instance().agent.getTemplate(AgentState.info().getTemplate());
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -79,7 +90,7 @@ public class ServerCom {
 	 */
 	public static Map<String, String> getConfig() throws CloudConductorException {
 		try {
-			return ServerCom.config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME);
+			return ServerCom.instance().config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -105,7 +116,7 @@ public class ServerCom {
 	public static Set<Service> getServices() throws CloudConductorException {
 		try {
 			String template = AgentState.info().getTemplate();
-			return ServerCom.agent.getServices(template);
+			return ServerCom.instance().agent.getServices(template);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -119,7 +130,7 @@ public class ServerCom {
 	 */
 	public static String getFileData(ConfigFile cf) throws CloudConductorException, TransformationErrorException {
 		try {
-			String content = ServerCom.agent.getConfigFileData(cf.getName());
+			String content = ServerCom.instance().agent.getConfigFileData(cf.getName());
 			content = content.replaceAll("\\r\\n", "\n");
 			content = content.replaceAll("\\r", "\n");
 			if (!cf.isTemplate()) {
@@ -144,7 +155,7 @@ public class ServerCom {
 	public static Set<SSHKey> getSSHKeys() throws CloudConductorException {
 		try {
 			String template = AgentState.info().getTemplate();
-			return ServerCom.agent.getSSHKeys(template);
+			return ServerCom.instance().agent.getSSHKeys(template);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -159,7 +170,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			return ServerCom.agent.notifyServiceState(template, host, req);
+			return ServerCom.instance().agent.notifyServiceState(template, host, req);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -174,7 +185,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			return ServerCom.agent.notifyPackageState(template, host, installedPackages);
+			return ServerCom.instance().agent.notifyPackageState(template, host, installedPackages);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -189,7 +200,7 @@ public class ServerCom {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
 			String agentName = AgentState.info().getAgent();
-			return ServerCom.agent.heartBeat(template, host, agentName);
+			return ServerCom.instance().agent.heartBeat(template, host, agentName);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -202,7 +213,7 @@ public class ServerCom {
 	public static Set<ConfigFile> getFiles() throws CloudConductorException {
 		try {
 			String template = AgentState.info().getTemplate();
-			return ServerCom.file.getConfigFilesByTemplate(template);
+			return ServerCom.instance().file.getConfigFilesByTemplate(template);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -214,7 +225,7 @@ public class ServerCom {
 	 */
 	public static boolean isServerAlive() throws CloudConductorException {
 		try {
-			return ServerCom.agent.isServerAlive();
+			return ServerCom.instance().agent.isServerAlive();
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}

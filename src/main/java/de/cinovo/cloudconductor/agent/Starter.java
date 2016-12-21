@@ -39,7 +39,8 @@ public final class Starter {
 	public static void main(final String[] args) {
 		Starter.assure(AgentVars.CLOUDCONDUCTOR_URL_PROP, "The CloudConductor url is not set.");
 		Starter.assure(AgentVars.TEMPLATE_PROP, "No template was set.");
-		
+		Starter.applyPropertyFromEnv(AgentVars.AGENT_PROP);
+		Starter.applyPropertyFromEnv(AgentVars.TOKEN_PROP);
 		Starter.initVelocity();
 		
 		DaemonStarter.startDaemon(AgentVars.SERVICE_NAME, new NodeAgent());
@@ -51,6 +52,14 @@ public final class Starter {
 				System.err.println(errorMsg);
 				System.exit(1);
 			} else {
+				System.setProperty(prop, System.getenv(prop));
+			}
+		}
+	}
+	
+	private static void applyPropertyFromEnv(String prop) {
+		if ((System.getProperty(prop) == null) || System.getProperty(prop).isEmpty()) {
+			if ((System.getenv(prop) != null) && !(System.getenv(prop).isEmpty())) {
 				System.setProperty(prop, System.getenv(prop));
 			}
 		}

@@ -38,38 +38,21 @@ import de.taimos.daemon.DaemonLifecycleAdapter;
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
- *
+ * 
  * @author psigloch
- *
+ * 
  */
 public final class NodeAgent extends DaemonLifecycleAdapter {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeAgent.class);
 	
 	
-	/** Constructor */
-	public NodeAgent() {
-		try {
-			while (!this.checkServer()) {
-				try {
-					Thread.sleep(AgentVars.WAIT_FOR_SERVER);
-				} catch (InterruptedException e) {
-					// just got on
-				}
-			}
-		} catch (ServerConnectionException e) {
-			// this is still before the logger gets initialized
-			System.err.println("The Template " + AgentState.info().getTemplate() + " is not known by the server. I have no work to do. Quitting...");
-			System.exit(1);
-		}
-	}
-	
 	private boolean checkServer() throws ServerConnectionException {
 		try {
 			ServerCom.isServerAlive();
 		} catch (CloudConductorException e) {
 			// this is still before the logger gets initialized
-			System.err.println("Initial server connection failed! Waiting for server and retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
+			NodeAgent.LOGGER.warn("Initial server connection failed! Waiting for server and retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
 			return false;
 		}
 		
@@ -100,17 +83,9 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	}
 	
 	@Override
-	public void doStart() throws Exception {
-		try {
-			FileHelper.writeYumRepo();
-		} catch (CloudConductorException | IOException e) {
-			NodeAgent.LOGGER.error("Couldn't create yum repo file.", e);
-			throw e;
-		}
-	}
-	
-	@Override
 	public void started() {
+		this.waitForServer();
+		this.initYum();
 		// start timed jobs
 		for (Class<AgentJob> jobClazz : OptionHandler.jobRegistry) {
 			AgentJob job;
@@ -118,16 +93,41 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 				job = jobClazz.newInstance();
 				if (job.isDefaultStart()) {
 					SchedulerService.instance.register(job.getJobIdentifier(), job, job.defaultStartTimer(), job.defaultStartTimerUnit());
-					NodeAgent.LOGGER.debug("Registered " + job.getJobIdentifier() + " as defaultstart with " + job.defaultStartTimer() + ":" + job.defaultStartTimerUnit());
+					NodeAgent.LOGGER.info("Registered " + job.getJobIdentifier() + " as defaultstart with " + job.defaultStartTimer() + ":" + job.defaultStartTimerUnit());
 				} else {
 					SchedulerService.instance.register(job.getJobIdentifier(), job);
-					NodeAgent.LOGGER.debug("Registered " + job.getJobIdentifier());
+					NodeAgent.LOGGER.info("Registered " + job.getJobIdentifier());
 				}
 			} catch (InstantiationException | IllegalAccessException e) {
 				NodeAgent.LOGGER.error("Couldn't start job: " + jobClazz.getName(), e);
 			}
 			
 		}
+	}
+	
+	private void waitForServer() {
+		try {
+			while (!this.checkServer()) {
+				try {
+					Thread.sleep(AgentVars.WAIT_FOR_SERVER);
+				} catch (InterruptedException e) {
+					// just got on
+				}
+			}
+		} catch (ServerConnectionException e) {
+			NodeAgent.LOGGER.error("The Template " + AgentState.info().getTemplate() + " is not known by the server. I have no work to do. Quitting...");
+			System.exit(1);
+		}
+	}
+	
+	public void initYum() {
+		try {
+			FileHelper.writeYumRepo();
+		} catch (CloudConductorException | IOException e) {
+			NodeAgent.LOGGER.error("Couldn't create yum repo file.", e);
+			return;
+		}
+		NodeAgent.LOGGER.info("Wrote yum repo");
 	}
 	
 	@Override

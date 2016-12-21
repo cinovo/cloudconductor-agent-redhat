@@ -82,9 +82,9 @@
 			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>de.taimos</groupId>
-			<artifactId>daemon-framework</artifactId>
-			<version>1.5</version>
+		    <groupId>de.taimos</groupId>
+		    <artifactId>daemon-framework</artifactId>
+		    <version>1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>de.cinovo.cloudconductor</groupId>

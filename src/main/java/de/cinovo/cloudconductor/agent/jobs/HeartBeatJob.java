@@ -27,7 +27,7 @@ public class HeartBeatJob implements AgentJob {
 	
 	@Override
 	public void run() {
-		HeartBeatJob.LOGGER.debug("Starting HeartBeatJob");
+		HeartBeatJob.LOGGER.info("Starting HeartBeatJob");
 		AgentOptions newOptions;
 		try {
 			newOptions = ServerCom.heartBeat();
@@ -37,7 +37,7 @@ public class HeartBeatJob implements AgentJob {
 		}
 		
 		new OptionHandler(newOptions).run();
-		HeartBeatJob.LOGGER.debug("Finished HeartBeatJob");
+		HeartBeatJob.LOGGER.info("Finished HeartBeatJob");
 	}
 	
 	@Override
