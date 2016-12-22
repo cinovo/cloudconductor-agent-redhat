@@ -1,14 +1,10 @@
 package de.cinovo.cloudconductor.agent.jobs.handler;
 
+import de.cinovo.cloudconductor.agent.jobs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.cinovo.cloudconductor.agent.AgentState;
-import de.cinovo.cloudconductor.agent.jobs.AgentJob;
-import de.cinovo.cloudconductor.agent.jobs.AuthorizedKeysJob;
-import de.cinovo.cloudconductor.agent.jobs.DefaultJob;
-import de.cinovo.cloudconductor.agent.jobs.FilesJob;
-import de.cinovo.cloudconductor.agent.jobs.HeartBeatJob;
 import de.cinovo.cloudconductor.api.lib.helper.SchedulerService;
 import de.cinovo.cloudconductor.api.model.AgentOptions;
 
@@ -73,17 +69,21 @@ public class OptionHandler {
 		switch (this.newOptions.getDoFileManagement()) {
 		case OFF:
 			OptionHandler.LOGGER.debug("OptionHandler: STOP FILE MNGMENT");
+			SchedulerService.instance.stop(DirectoriesJob.JOB_NAME);
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
 			break;
 		case ONCE:
 			OptionHandler.LOGGER.debug("OptionHandler: ONCE FILE MNGMENT");
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
+			SchedulerService.instance.stop(DirectoriesJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(FilesJob.JOB_NAME);
+			SchedulerService.instance.executeOnce(DirectoriesJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
 				OptionHandler.LOGGER.debug("OptionHandler: REPEATE FILE MNGMENT");
 				SchedulerService.instance.resetTask(FilesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
+				SchedulerService.instance.resetTask(DirectoriesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
 			}
 			break;
 		}

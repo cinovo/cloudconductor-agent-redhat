@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: de.cinovo.cloudconductor:cloudconductor-api:2.13-WS-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/cinovo/cloudconductor/cloudconductor-api/2.13-WS-SNAPSHOT/cloudconductor-api-2.13-WS-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/cinovo/cloudconductor/cloudconductor-api/2.13-WS-SNAPSHOT/cloudconductor-api-2.13-WS-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/cinovo/cloudconductor/cloudconductor-api/2.13-WS-SNAPSHOT/cloudconductor-api-2.13-WS-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

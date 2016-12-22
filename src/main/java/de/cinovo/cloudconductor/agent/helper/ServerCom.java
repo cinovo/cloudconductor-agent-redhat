@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 
+import de.cinovo.cloudconductor.api.lib.manager.DirectoryHandler;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -42,6 +43,7 @@ import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
 import de.cinovo.cloudconductor.api.model.Template;
+import de.cinovo.cloudconductor.api.model.Directory;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -55,6 +57,7 @@ public class ServerCom {
 	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer());
 	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer());
 	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer());
+	private static final DirectoryHandler directory = new DirectoryHandler(AgentState.info().getServer());
 
 
 	private ServerCom() {
@@ -192,6 +195,20 @@ public class ServerCom {
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
+	}
+
+	/**
+	 * @return the response
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
+	 */
+	public static Set<Directory> getDirectories() throws CloudConductorException {
+		try{
+			String template = AgentState.info().getTemplate();
+			return ServerCom.directory.getDirectoryByTemplate(template);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+
 	}
 	
 	/**
