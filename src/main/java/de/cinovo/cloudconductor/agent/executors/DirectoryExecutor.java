@@ -2,6 +2,7 @@ package de.cinovo.cloudconductor.agent.executors;
 
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
+import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.model.Directory;
 
 import java.io.File;
@@ -32,18 +33,30 @@ public class DirectoryExecutor implements IExecutor<Set<String>> {
 
     @Override
     public IExecutor<Set<String>> execute() throws ExecutionError {
+        this.errors = new StringBuilder();
         for(Directory dir : this.directories){
             Path path = Paths.get(dir.getTargetPath());
             //check if directory already exists
             File dirs = new File(dir.getTargetPath());
+            String fileMode;
             if(Files.notExists(path)){
                 //create new directories and check directory modes and owner on success
                 if(dirs.mkdirs()){
                     this.checkDirPermOwner(dirs, dir.getFileMode(), dir.getOwner(), dir.getGroup());
                 }
             } else {
-                this.checkDirPermOwner(dirs, dir.getFileMode(), dir.getOwner(), dir.getGroup());
+                try {
+                    fileMode = ServerCom.getDirectoryMode(dir.getName());
+                } catch (Exception e){
+                    fileMode = dir.getFileMode();
+                    this.errors.append(e.getMessage());
+                }
+                this.checkDirPermOwner(dirs, fileMode, dir.getOwner(), dir.getGroup());
             }
+        }
+
+        if (!this.errors.toString().trim().isEmpty()) {
+            throw new ExecutionError(this.errors.toString().trim());
         }
         return this;
     }

@@ -210,7 +210,35 @@ public class ServerCom {
 		}
 
 	}
-	
+
+	/**
+	 *
+	 * @param dirName
+	 * @return directory "filemode"
+	 * @throws CloudConductorException
+	 */
+	public static String getDirectoryMode(String dirName) throws CloudConductorException {
+		try {
+			return ServerCom.agent.getDirectoryFileMode(dirName);
+		} catch (RuntimeException e){
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+
+	/**
+	 *
+	 * @param fileName
+	 * @return get file filemode
+	 * @throws CloudConductorException
+	 */
+	public static String getFileMode(String fileName) throws CloudConductorException {
+		try {
+			return ServerCom.agent.getFileFileMode(fileName);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+
 	/**
 	 * @return the response
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed

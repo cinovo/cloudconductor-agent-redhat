@@ -38,7 +38,7 @@ public class DirectoriesJob implements AgentJob {
 
     @Override
     public void run() {
-        LOGGER.debug("Started Directory Job");
+        DirectoriesJob.LOGGER.debug("Started Directory Job");
 
         if(AgentState.directoryExecutionLock.tryLock()){
             try {
@@ -48,9 +48,9 @@ public class DirectoriesJob implements AgentJob {
                     LOGGER.debug(e.getMessage(), e);
                 }
             } finally {
-                AgentState.filesExecutionLock.unlock();
+                AgentState.directoryExecutionLock.unlock();
             }
         }
-        LOGGER.debug("finished Directory Job");
+        DirectoriesJob.LOGGER.debug("finished Directory Job");
     }
 }

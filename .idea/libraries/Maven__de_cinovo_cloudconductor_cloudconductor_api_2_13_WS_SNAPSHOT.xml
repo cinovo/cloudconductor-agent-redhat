@@ -8,6 +8,9 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/de/cinovo/cloudconductor/cloudconductor-api/2.13-WS-SNAPSHOT/cloudconductor-api-2.13-WS-SNAPSHOT-sources.jar!/" />
+      <root url="file://$MAVEN_REPOSITORY$/de/cinovo/cloudconductor/cloudconductor-api/2.13-WS-SNAPSHOT" />
+      <root url="file://$PROJECT_DIR$/../cloudconductor-api/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../cloudconductor-api/src/test/java" />
     </SOURCES>
   </library>
 </component>

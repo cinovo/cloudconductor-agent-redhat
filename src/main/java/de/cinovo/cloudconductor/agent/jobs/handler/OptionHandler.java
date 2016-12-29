@@ -21,7 +21,7 @@ public class OptionHandler {
 	
 	/** existing jobs */
 	@SuppressWarnings("unchecked")
-	public static final Class<AgentJob>[] jobRegistry = new Class[] {DefaultJob.class, AuthorizedKeysJob.class, FilesJob.class, HeartBeatJob.class};
+	public static final Class<AgentJob>[] jobRegistry = new Class[] {DefaultJob.class, AuthorizedKeysJob.class, DirectoriesJob.class, FilesJob.class, HeartBeatJob.class};
 	
 	private AgentOptions newOptions;
 	

@@ -108,13 +108,16 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			
 			// set file mode
 			try {
-				String fileMode = FileHelper.fileModeIntToString(file.getFileMode());
+				String fileMode = FileHelper.fileModeIntToString(ServerCom.getFileMode(file.getName()));
 				if (!FileHelper.isFileMode(localFile, fileMode)) {
 					FileHelper.chmod(localFile, fileMode);
 					changeOccured = true;
 				}
 			} catch (IOException e) {
 				this.errors.append("Failed to set chmod for file: " + localFile.getAbsolutePath());
+				this.errors.append(System.lineSeparator());
+			} catch (CloudConductorException e){
+				this.errors.append(e.getMessage());
 				this.errors.append(System.lineSeparator());
 			}
 			
