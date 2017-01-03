@@ -43,6 +43,8 @@ public class AgentState {
 	
 	/** a write lock for file jobs */
 	public static final Lock filesExecutionLock = new ReentrantLock();
+
+	public static final Lock directoryExecutionLock = new ReentrantLock();
 	
 	private static AgentState instance;
 	private static VelocityContext velocityContext;

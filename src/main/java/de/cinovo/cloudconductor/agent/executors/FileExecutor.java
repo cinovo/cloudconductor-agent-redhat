@@ -108,13 +108,16 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			
 			// set file mode
 			try {
-				String fileMode = this.fileModeIntToString(file.getFileMode());
+				String fileMode = FileHelper.fileModeIntToString(ServerCom.getFileMode(file.getName()));
 				if (!FileHelper.isFileMode(localFile, fileMode)) {
 					FileHelper.chmod(localFile, fileMode);
 					changeOccured = true;
 				}
 			} catch (IOException e) {
 				this.errors.append("Failed to set chmod for file: " + localFile.getAbsolutePath());
+				this.errors.append(System.lineSeparator());
+			} catch (CloudConductorException e){
+				this.errors.append(e.getMessage());
 				this.errors.append(System.lineSeparator());
 			}
 			
@@ -130,39 +133,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		return this;
 	}
 	
-	private String fileModeIntToString(String mod) {
-		char[] str;
-		if (mod.length() > 3) {
-			str = mod.substring(1, 3).toCharArray();
-		} else {
-			str = mod.toCharArray();
-		}
-		StringBuilder s = new StringBuilder();
-		for (int k = 0; k < 3; k++) {
-			char[] test = Integer.toBinaryString(Integer.parseInt(String.valueOf(str[k]))).toCharArray();
-			if (test.length < 3) {
-				test = new char[] {'0', test.length > 1 ? test[test.length - 2] : '0', test.length > 0 ? test[test.length - 1] : '0'};
-			}
-			for (int i = 0; i < 3; i++) {
-				if (test[i] != '1') {
-					s.append("-");
-					continue;
-				}
-				switch (i) {
-				case 0:
-					s.append("r");
-					break;
-				case 1:
-					s.append("w");
-					break;
-				case 2:
-					s.append("x");
-					break;
-				}
-			}
-		}
-		return s.toString();
-	}
+
 	
 	@Override
 	public boolean failed() {
