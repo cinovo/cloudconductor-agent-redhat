@@ -192,7 +192,11 @@ public class FileHelper {
 			writer.flush();
 		}
 	}
-
+	
+	/**
+	 * @param mod the int value of the file mode
+	 * @return the string representation of the file mode
+	 */
 	public static String fileModeIntToString(String mod) {
 		char[] str;
 		if (mod.length() > 3) {
@@ -212,15 +216,15 @@ public class FileHelper {
 					continue;
 				}
 				switch (i) {
-					case 0:
-						s.append("r");
-						break;
-					case 1:
-						s.append("w");
-						break;
-					case 2:
-						s.append("x");
-						break;
+				case 0:
+					s.append("r");
+					break;
+				case 1:
+					s.append("w");
+					break;
+				case 2:
+					s.append("x");
+					break;
 				}
 			}
 		}

@@ -22,8 +22,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
 import de.cinovo.cloudconductor.api.model.AgentOptions;
@@ -43,14 +41,12 @@ public class AgentState {
 	
 	/** a write lock for file jobs */
 	public static final Lock filesExecutionLock = new ReentrantLock();
-
+	/** a write lock for directory jobs */
 	public static final Lock directoryExecutionLock = new ReentrantLock();
 	
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
 	private static AgentOptions options;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(AgentState.class);
 	
 	
 	/**

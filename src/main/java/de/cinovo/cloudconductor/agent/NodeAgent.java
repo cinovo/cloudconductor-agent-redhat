@@ -120,6 +120,9 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 		}
 	}
 	
+	/**
+	 * yum initialization
+	 */
 	public void initYum() {
 		try {
 			FileHelper.writeYumRepo();

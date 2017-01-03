@@ -22,7 +22,6 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 
-import de.cinovo.cloudconductor.api.lib.manager.DirectoryHandler;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -34,8 +33,10 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.lib.manager.AgentHandler;
 import de.cinovo.cloudconductor.api.lib.manager.ConfigFileHandler;
 import de.cinovo.cloudconductor.api.lib.manager.ConfigValueHandler;
+import de.cinovo.cloudconductor.api.lib.manager.DirectoryHandler;
 import de.cinovo.cloudconductor.api.model.AgentOptions;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
+import de.cinovo.cloudconductor.api.model.Directory;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
 import de.cinovo.cloudconductor.api.model.SSHKey;
@@ -43,7 +44,6 @@ import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
 import de.cinovo.cloudconductor.api.model.Template;
-import de.cinovo.cloudconductor.api.model.Directory;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -197,40 +197,40 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the response
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static Set<Directory> getDirectories() throws CloudConductorException {
-		try{
+		try {
 			String template = AgentState.info().getTemplate();
 			return ServerCom.directory.getDirectoryByTemplate(template);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
-
+		
 	}
-
+	
 	/**
 	 *
-	 * @param dirName
+	 * @param dirName the directory name
 	 * @return directory "filemode"
-	 * @throws CloudConductorException
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static String getDirectoryMode(String dirName) throws CloudConductorException {
 		try {
 			return ServerCom.agent.getDirectoryFileMode(dirName);
-		} catch (RuntimeException e){
+		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 *
-	 * @param fileName
+	 * @param fileName the file name
 	 * @return get file filemode
-	 * @throws CloudConductorException
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
 	public static String getFileMode(String fileName) throws CloudConductorException {
 		try {
@@ -239,7 +239,7 @@ public class ServerCom {
 			throw new CloudConductorException(e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @return the response
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
