@@ -17,6 +17,12 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -152,10 +158,21 @@ public class AgentState {
 	 * @param templateName the name of the template
 	 */
 	public void updateTemplate(String templateName) {
+		Charset charset = StandardCharsets.UTF_8;
 		if (this.getTemplate().equals(templateName)) {
 			return;
 		}
 		System.setProperty(AgentVars.TEMPLATE_PROP, templateName);
+		try {
+			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
+
+			String content = new String(Files.readAllBytes(path), charset);
+			content = content.replaceAll("export TEMPLATE_NAME=\".*\"", "export TEMPLATE_NAME=\"" + templateName + "\"");
+			Files.write(path, content.getBytes(charset));
+		} catch (IOException ex){
+			System.out.println(ex.getMessage());
+		}
+
 	}
 	
 }
