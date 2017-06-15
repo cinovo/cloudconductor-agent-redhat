@@ -36,29 +36,61 @@ prErr() {
 	fi
 }
 
-## handle restart
-for element in "${RESTART[@]}"
-do
-    service $element restart &> /dev/null		
-	if [ $? -gt 0 ]; then
-		echo "RESTART of $element failed. Attemp to stop and start seperately." 1>&2
-		service $element stop &> /dev/null
-		prErr "STOPPING" $element
-		service $element start &> /dev/null
-		prErr "STARTING" $element
-	fi
-done
+which systemcl
 
-##handle stop
-for element in "${STOP[@]}"
-do
-	service $element stop &> /dev/null
-	prErr "STOPPING" $element
-done
+if [ $? -eq 1 ]
+then
+    ## handle restart
+    for element in "${RESTART[@]}"
+    do
+        service $element restart &> /dev/null
+        if [ $? -gt 0 ]; then
+            echo "RESTART of $element failed. Attemp to stop and start seperately." 1>&2
+            service $element stop &> /dev/null
+            prErr "STOPPING" $element
+            service $element start &> /dev/null
+            prErr "STARTING" $element
+        fi
+    done
 
-##handle start
-for element in "${START[@]}"
-do
-	service $element start &> /dev/null
-	prErr "STARTING" $element
-done
+    ##handle stop
+    for element in "${STOP[@]}"
+    do
+        service $element stop &> /dev/null
+        prErr "STOPPING" $element
+    done
+
+    ##handle start
+    for element in "${START[@]}"
+    do
+        service $element start &> /dev/null
+        prErr "STARTING" $element
+    done
+else
+    ## handle restart
+    for element in "${RESTART[@]}"
+    do
+        systemctl restart $element &> /dev/null
+        if [ $? -gt 0 ]; then
+            echo "RESTART of $element failed. Attemp to stop and start seperately." 1>&2
+            systemctl stop $element &> /dev/null
+            prErr "STOPPING" $element
+            systemctl start $element &> /dev/null
+            prErr "STARTING" $element
+        fi
+    done
+
+    ##handle stop
+    for element in "${STOP[@]}"
+    do
+        systemctl stop $element &> /dev/null
+        prErr "STOPPING" $element
+    done
+
+    ##handle start
+    for element in "${START[@]}"
+    do
+        systemctl start $element &> /dev/null
+        prErr "STARTING" $element
+    done
+fi
