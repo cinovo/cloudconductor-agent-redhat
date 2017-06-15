@@ -91,4 +91,10 @@ public interface AgentVars {
 	 * relative path to the script folder
 	 */
 	public static final String SCRIPTFOLDER = "scripts/";
+
+	/**
+	 * property for agent / host uuid
+	 */
+	public static final String UUID_PROP = "UUID";
+
 }

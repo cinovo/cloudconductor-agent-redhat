@@ -115,6 +115,11 @@ public class AgentState {
 	public String getTemplate() {
 		return System.getProperty(AgentVars.TEMPLATE_PROP);
 	}
+
+	/**
+	 * @return uuid
+	 */
+	public String getUuid() { return  System.getProperty(AgentVars.UUID_PROP); }
 	
 	/**
 	 * @return the config server api url
@@ -150,6 +155,7 @@ public class AgentState {
 	public static void setOptions(AgentOptions options) {
 		AgentState.options = options;
 		AgentState.info().updateTemplate(options.getTemplateName());
+		AgentState.info().updateUuid(options.getUuid());
 	}
 	
 	/**
@@ -173,6 +179,33 @@ public class AgentState {
 			System.out.println(ex.getMessage());
 		}
 
+	}
+
+	/**
+	 * update host uuid
+	 * @param uuid of the host
+	 */
+	public void updateUuid(String uuid){
+		Charset charset = StandardCharsets.UTF_8;
+		if(this.getUuid() != null) {
+			if (this.getUuid().equals(uuid)) {
+				return;
+			}
+		}
+		System.setProperty(AgentVars.UUID_PROP, uuid);
+		try {
+			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
+
+			String content = new String(Files.readAllBytes(path), charset);
+			if(content.contains("UUID")){
+				content = content.replaceAll("export UUID=\".*\"", "export UUID=\"" + uuid + "\"");
+			} else {
+				content = content + "export UUID=\"" + uuid + "\"\n";
+			}
+			Files.write(path, content.getBytes(charset));
+		} catch (IOException ex){
+			System.out.println(ex.getMessage());
+		}
 	}
 	
 }
