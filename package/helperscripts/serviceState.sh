@@ -16,6 +16,11 @@ else
         systemctl status $element &> /dev/null
         if [ $? -eq 0 ]; then
             echo $element
+        else
+            service $element status
+            if [ $? -eq 0 ]; then
+                echo $element
+            fi
         fi
     done
 fi
