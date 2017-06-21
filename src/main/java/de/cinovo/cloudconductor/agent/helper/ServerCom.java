@@ -17,16 +17,6 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
@@ -34,16 +24,16 @@ import de.cinovo.cloudconductor.api.lib.manager.AgentHandler;
 import de.cinovo.cloudconductor.api.lib.manager.ConfigFileHandler;
 import de.cinovo.cloudconductor.api.lib.manager.ConfigValueHandler;
 import de.cinovo.cloudconductor.api.lib.manager.DirectoryHandler;
-import de.cinovo.cloudconductor.api.model.AgentOptions;
-import de.cinovo.cloudconductor.api.model.ConfigFile;
-import de.cinovo.cloudconductor.api.model.Directory;
-import de.cinovo.cloudconductor.api.model.PackageState;
-import de.cinovo.cloudconductor.api.model.PackageStateChanges;
-import de.cinovo.cloudconductor.api.model.SSHKey;
-import de.cinovo.cloudconductor.api.model.Service;
-import de.cinovo.cloudconductor.api.model.ServiceStates;
-import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
-import de.cinovo.cloudconductor.api.model.Template;
+import de.cinovo.cloudconductor.api.model.*;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -162,12 +152,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid;
-			if(AgentState.info().getUuid() == null){
-				uuid = AgentState.info().getHost();
-			} else {
-				uuid = AgentState.info().getUuid();
-			}
+			String uuid= AgentState.info().getUuid();
 			return ServerCom.agent.notifyServiceState(template, host, req, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
@@ -183,12 +168,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid;
-			if(AgentState.info().getUuid() == null){
-				uuid = AgentState.info().getHost();
-			} else {
-				uuid = AgentState.info().getUuid();
-			}
+			String uuid= AgentState.info().getUuid();
 			return ServerCom.agent.notifyPackageState(template, host, installedPackages, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
@@ -203,13 +183,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid;
-			if(AgentState.info().getUuid() == null){
-				uuid = AgentState.info().getHost();
-			} else {
-				uuid = AgentState.info().getUuid();
-			}
-			System.out.print(uuid);
+			String uuid= AgentState.info().getUuid();
 			String agentName = AgentState.info().getAgent();
 			return ServerCom.agent.heartBeat(template, host, agentName, uuid);
 		} catch (RuntimeException e) {

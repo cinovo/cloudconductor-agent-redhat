@@ -27,74 +27,82 @@ package de.cinovo.cloudconductor.agent.helper;
 public interface AgentVars {
 	
 	/** the name of the service */
-	public static final String SERVICE_NAME = "cloudconductor-agent";
+	String SERVICE_NAME = "cloudconductor-agent";
 	
 	/**
 	 * The wait time for server connection retries at start up
 	 */
-	public static final long WAIT_FOR_SERVER = 5000;
+	long WAIT_FOR_SERVER = 5000;
 	
 	/**
 	 * property for the server url
 	 */
-	public static final String CLOUDCONDUCTOR_URL_PROP = "CLOUDCONDUCTOR_URL";
+	String CLOUDCONDUCTOR_URL_PROP = "CLOUDCONDUCTOR_URL";
 	/**
 	 * additional url path for api access of server
 	 */
-	public static final String CLOUDCONDUCTOR_API_PATH = "/api";
+	String CLOUDCONDUCTOR_API_PATH = "/api";
 	
 	/**
 	 * property for the template name
 	 */
-	public static final String TEMPLATE_PROP = "TEMPLATE_NAME";
+	String TEMPLATE_PROP = "TEMPLATE_NAME";
 	
 	/**
 	 * property for the agent name
 	 */
-	public static final String AGENT_PROP = "AGENT_NAME";
+	String AGENT_PROP = "AGENT_NAME";
 	
 	/**
 	 * property for the authentication token
 	 */
-	public static final String TOKEN_PROP = "AUTH_TOKEN";
+	String TOKEN_PROP = "AUTH_TOKEN";
 	/**
 	 * property for the yum repo name
 	 */
-	public static final String YUM_NAME_PROP = "nodeagent.repo.name";
+	String YUM_NAME_PROP = "nodeagent.repo.name";
 	/**
 	 * derfault yum repo name
 	 */
-	public static final String YUM_NAME_PROP_DEFAULT = "cinovo";
+	String YUM_NAME_PROP_DEFAULT = "cinovo";
 	
 	/**
 	 * system path for yum repos
 	 */
-	public static final String YUM_REPO_FOLDER = "/etc/yum.repos.d/";
+	String YUM_REPO_FOLDER = "/etc/yum.repos.d/";
 	/**
 	 * file ending for yum repo definition files
 	 */
-	public static final String YUM_REPO_ENDING = ".repo";
+	String YUM_REPO_ENDING = ".repo";
 	
 	/**
 	 * service state script
 	 */
-	public static final String SCRIPT_SERVICE_STATE = "serviceState.sh";
+	String SCRIPT_SERVICE_STATE = "serviceState.sh";
 	/**
 	 * service handler script
 	 */
-	public static final String SCRIPT_SERVICE_HANDLER = "serviceHandler.sh";
+	String SCRIPT_SERVICE_HANDLER = "serviceHandler.sh";
 	/**
 	 * yum handler script
 	 */
-	public static final String SCRIPT_YUM_HANDLER = "yumHandler.sh";
+	String SCRIPT_YUM_HANDLER = "yumHandler.sh";
 	/**
 	 * relative path to the script folder
 	 */
-	public static final String SCRIPTFOLDER = "scripts/";
+	String SCRIPTFOLDER = "scripts/";
 
 	/**
 	 * property for agent / host uuid
 	 */
-	public static final String UUID_PROP = "UUID";
+	String UUID_PROP = "UUID";
+	/**
+	 * property for agent communication protocol
+	 */
+	String COMMUNICATION_PROTOCOL = "COM_PROTOCOL";
+	/**
+	 * default agent communication protocol
+	 */
+	String COMMUNICATION_PROTOCOL_DEFAULT = "http";
 
 }
