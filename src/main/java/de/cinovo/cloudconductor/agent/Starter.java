@@ -41,6 +41,7 @@ public final class Starter {
 		Starter.assure(AgentVars.TEMPLATE_PROP, "No template was set.");
 		Starter.applyPropertyFromEnv(AgentVars.AGENT_PROP);
 		Starter.applyPropertyFromEnv(AgentVars.TOKEN_PROP);
+		Starter.applyPropertyFromEnv(AgentVars.UUID_PROP);
 		Starter.initVelocity();
 		
 		DaemonStarter.startDaemon(AgentVars.SERVICE_NAME, new NodeAgent());

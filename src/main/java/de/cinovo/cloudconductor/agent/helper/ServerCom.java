@@ -162,7 +162,13 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			return ServerCom.agent.notifyServiceState(template, host, req);
+			String uuid;
+			if(AgentState.info().getUuid() == null){
+				uuid = AgentState.info().getHost();
+			} else {
+				uuid = AgentState.info().getUuid();
+			}
+			return ServerCom.agent.notifyServiceState(template, host, req, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -177,7 +183,13 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			return ServerCom.agent.notifyPackageState(template, host, installedPackages);
+			String uuid;
+			if(AgentState.info().getUuid() == null){
+				uuid = AgentState.info().getHost();
+			} else {
+				uuid = AgentState.info().getUuid();
+			}
+			return ServerCom.agent.notifyPackageState(template, host, installedPackages, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
@@ -191,8 +203,15 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
+			String uuid;
+			if(AgentState.info().getUuid() == null){
+				uuid = AgentState.info().getHost();
+			} else {
+				uuid = AgentState.info().getUuid();
+			}
+			System.out.print(uuid);
 			String agentName = AgentState.info().getAgent();
-			return ServerCom.agent.heartBeat(template, host, agentName);
+			return ServerCom.agent.heartBeat(template, host, agentName, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
