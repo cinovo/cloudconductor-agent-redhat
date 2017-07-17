@@ -36,7 +36,7 @@ prErr() {
 	fi
 }
 
-which systemcl
+which systemctl
 
 if [ $? -eq 1 ]; then
     ## handle restart
