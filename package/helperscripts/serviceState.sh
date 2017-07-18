@@ -14,9 +14,10 @@ else
     for element in "${@:1}"
     do
         systemctl status $element &> /dev/null
-        if [ $? -eq 0 ]; then
+        systemctlstate=`echo $?`
+        if [ ${systemctlstate} -eq 0 ]; then
             echo $element
-        else
+        elif [ ${systemctlstate} -ne 3 ]; then
             service $element status
             if [ $? -eq 0 ]; then
                 echo $element
