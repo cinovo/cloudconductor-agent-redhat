@@ -20,6 +20,10 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
+import com.google.common.io.Files;
+import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import de.cinovo.cloudconductor.api.model.SSHKey;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,11 +38,6 @@ import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collection;
 import java.util.Set;
-
-import com.google.common.io.Files;
-
-import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.model.SSHKey;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -146,7 +145,7 @@ public class FileHelper {
 	
 	/**
 	 * @param localFile the local file to use chmod on
-	 * @param fileMode the filemode to set in PosixFilePermissions string type -> 764 = rwxrw-r--
+	 * @param fileMode the filemode to set in PosixFilePermissions string type - 764 = rwxrw-r--
 	 * @throws IOException if chmod couldn't be edited
 	 */
 	public static void chmod(File localFile, String fileMode) throws IOException {
