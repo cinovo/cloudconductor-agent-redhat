@@ -42,6 +42,7 @@ public final class Starter {
 		Starter.applyPropertyFromEnv(AgentVars.AGENT_PROP);
 		Starter.applyPropertyFromEnv(AgentVars.TOKEN_PROP);
 		Starter.applyPropertyFromEnv(AgentVars.UUID_PROP);
+		Starter.applyPropertyFromEnv(AgentVars.COMMUNICATION_PROTOCOL);
 		Starter.initVelocity();
 		
 		DaemonStarter.startDaemon(AgentVars.SERVICE_NAME, new NodeAgent());
