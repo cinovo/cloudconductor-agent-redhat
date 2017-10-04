@@ -17,23 +17,31 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-import de.cinovo.cloudconductor.agent.AgentState;
-import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
-import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.lib.manager.AgentHandler;
-import de.cinovo.cloudconductor.api.lib.manager.ConfigFileHandler;
-import de.cinovo.cloudconductor.api.lib.manager.ConfigValueHandler;
-import de.cinovo.cloudconductor.api.lib.manager.DirectoryHandler;
-import de.cinovo.cloudconductor.api.model.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-import java.util.Set;
+import de.cinovo.cloudconductor.agent.AgentState;
+import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
+import de.cinovo.cloudconductor.agent.jobs.handler.api.AgentHandler;
+import de.cinovo.cloudconductor.agent.jobs.handler.api.ConfigFileHandler;
+import de.cinovo.cloudconductor.agent.jobs.handler.api.ConfigValueHandler;
+import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import de.cinovo.cloudconductor.api.model.AgentOption;
+import de.cinovo.cloudconductor.api.model.ConfigFile;
+import de.cinovo.cloudconductor.api.model.PackageState;
+import de.cinovo.cloudconductor.api.model.PackageStateChanges;
+import de.cinovo.cloudconductor.api.model.SSHKey;
+import de.cinovo.cloudconductor.api.model.Service;
+import de.cinovo.cloudconductor.api.model.ServiceStates;
+import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
+import de.cinovo.cloudconductor.api.model.Template;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -47,7 +55,6 @@ public class ServerCom {
 	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
-	private static final DirectoryHandler directory = new DirectoryHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	
 	
 	private ServerCom() {
@@ -152,7 +159,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid= AgentState.info().getUuid();
+			String uuid = AgentState.info().getUuid();
 			return ServerCom.agent.notifyServiceState(template, host, req, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
@@ -168,7 +175,7 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid= AgentState.info().getUuid();
+			String uuid = AgentState.info().getUuid();
 			return ServerCom.agent.notifyPackageState(template, host, installedPackages, uuid);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
@@ -179,41 +186,13 @@ public class ServerCom {
 	 * @return the response
 	 * @throws CloudConductorException thrown if communication with cloudconductor failed
 	 */
-	public static AgentOptions heartBeat() throws CloudConductorException {
+	public static AgentOption heartBeat() throws CloudConductorException {
 		try {
 			String template = AgentState.info().getTemplate();
 			String host = AgentState.info().getHost();
-			String uuid= AgentState.info().getUuid();
+			String uuid = AgentState.info().getUuid();
 			String agentName = AgentState.info().getAgent();
 			return ServerCom.agent.heartBeat(template, host, agentName, uuid);
-		} catch (RuntimeException e) {
-			throw new CloudConductorException(e.getMessage());
-		}
-	}
-	
-	/**
-	 * @return the response
-	 * @throws CloudConductorException thrown if communication with cloudconductor failed
-	 */
-	public static Set<Directory> getDirectories() throws CloudConductorException {
-		try {
-			String template = AgentState.info().getTemplate();
-			return ServerCom.directory.getDirectoryByTemplate(template);
-		} catch (RuntimeException e) {
-			throw new CloudConductorException(e.getMessage());
-		}
-		
-	}
-	
-	/**
-	 *
-	 * @param dirName the directory name
-	 * @return directory "filemode"
-	 * @throws CloudConductorException thrown if communication with cloudconductor failed
-	 */
-	public static String getDirectoryMode(String dirName) throws CloudConductorException {
-		try {
-			return ServerCom.agent.getDirectoryFileMode(dirName);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}

@@ -30,8 +30,8 @@ import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.AgentJob;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
+import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.lib.helper.SchedulerService;
 import de.cinovo.cloudconductor.api.model.Template;
 import de.taimos.daemon.DaemonLifecycleAdapter;
 

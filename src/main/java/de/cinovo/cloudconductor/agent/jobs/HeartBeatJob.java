@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.model.AgentOptions;
+import de.cinovo.cloudconductor.api.model.AgentOption;
 
 /**
  * Copyright 2014 Cinovo AG<br>
@@ -28,7 +28,7 @@ public class HeartBeatJob implements AgentJob {
 	@Override
 	public void run() {
 		HeartBeatJob.LOGGER.info("Starting HeartBeatJob");
-		AgentOptions newOptions;
+		AgentOption newOptions;
 		try {
 			newOptions = ServerCom.heartBeat();
 		} catch (CloudConductorException e) {

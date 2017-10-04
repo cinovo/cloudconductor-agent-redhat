@@ -17,13 +17,6 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
-import de.cinovo.cloudconductor.agent.helper.AgentVars;
-import de.cinovo.cloudconductor.api.model.AgentOptions;
-import de.taimos.daemon.DaemonStarter;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +27,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.cinovo.cloudconductor.agent.helper.AgentVars;
+import de.cinovo.cloudconductor.api.model.AgentOption;
+import de.taimos.daemon.DaemonStarter;
+
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
@@ -41,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author psigloch
  */
 public class AgentState {
-
+	
 	/**
 	 * a write lock for package jobs
 	 */
@@ -56,123 +57,124 @@ public class AgentState {
 	public static final Lock directoryExecutionLock = new ReentrantLock();
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
-	private static AgentOptions options;
+	private static AgentOption options;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String cloudconductor;
-
+	
+	
 	private AgentState() {
 		this.initCloudConductorServer();
 	}
-
+	
 	/**
 	 * @return the agent state instance
 	 */
 	public static AgentState info() {
-		if(AgentState.instance == null) {
+		if (AgentState.instance == null) {
 			AgentState.instance = new AgentState();
 		}
 		return AgentState.instance;
 	}
-
+	
 	/**
 	 * @return the global velocity context
 	 */
 	public static VelocityContext vContext() {
-		if(AgentState.velocityContext == null) {
+		if (AgentState.velocityContext == null) {
 			AgentState.velocityContext = new VelocityContext();
-			for(Entry<String, String> entry : System.getenv().entrySet()) {
+			for (Entry<String, String> entry : System.getenv().entrySet()) {
 				AgentState.velocityContext.put(entry.getKey(), entry.getValue());
 			}
-			for(Entry<Object, Object> entry : System.getProperties().entrySet()) {
+			for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
 				AgentState.velocityContext.put((String) entry.getKey(), entry.getValue());
 			}
 		}
 		return AgentState.velocityContext;
 	}
-
+	
 	/**
 	 * @return the options
 	 */
-	public static AgentOptions getOptions() {
+	public static AgentOption getOptions() {
 		return AgentState.options;
 	}
-
+	
 	/**
 	 * @param options the options to set
 	 */
-	public static void setOptions(AgentOptions options) {
+	public static void setOptions(AgentOption options) {
 		AgentState.options = options;
 		AgentState.info().updateTemplate(options.getTemplateName());
 		AgentState.info().updateUuid(options.getUuid());
 	}
-
+	
 	private void initCloudConductorServer() {
 		this.cloudconductor = System.getProperty(AgentVars.CLOUDCONDUCTOR_URL_PROP);
-		if(this.cloudconductor.endsWith("/")) {
+		if (this.cloudconductor.endsWith("/")) {
 			this.cloudconductor = this.cloudconductor.substring(0, this.cloudconductor.length() - 1);
 		}
-
+		
 		String protocol = System.getProperty(AgentVars.COMMUNICATION_PROTOCOL, AgentVars.COMMUNICATION_PROTOCOL_DEFAULT);
-		if(protocol.equalsIgnoreCase("https")) {
+		if (protocol.equalsIgnoreCase("https")) {
 			protocol = "https://";
 		} else {
 			protocol = "http://";
 		}
-
-		if(!this.cloudconductor.startsWith(protocol)) {
+		
+		if (!this.cloudconductor.startsWith(protocol)) {
 			this.cloudconductor = protocol + this.cloudconductor;
 		}
-
-		if(!this.cloudconductor.endsWith(AgentVars.CLOUDCONDUCTOR_API_PATH)) {
+		
+		if (!this.cloudconductor.endsWith(AgentVars.CLOUDCONDUCTOR_API_PATH)) {
 			this.cloudconductor = this.cloudconductor + AgentVars.CLOUDCONDUCTOR_API_PATH;
 		}
 	}
-
+	
 	/**
 	 * @return the host name
 	 */
 	public String getHost() {
 		return DaemonStarter.getHostname();
 	}
-
+	
 	/**
 	 * @return the template name
 	 */
 	public String getTemplate() {
 		return System.getProperty(AgentVars.TEMPLATE_PROP);
 	}
-
+	
 	/**
 	 * @return uuid
 	 */
 	public String getUuid() {
-		if(System.getProperty(AgentVars.UUID_PROP) == null || System.getProperty(AgentVars.UUID_PROP).trim().isEmpty()) {
+		if ((System.getProperty(AgentVars.UUID_PROP) == null) || System.getProperty(AgentVars.UUID_PROP).trim().isEmpty()) {
 			return AgentState.info().getHost();
 		}
 		return System.getProperty(AgentVars.UUID_PROP);
 	}
-
+	
 	/**
 	 * @return the config server api url
 	 */
 	public String getServer() {
 		return this.cloudconductor;
 	}
-
+	
 	/**
 	 * @return the agent name of this agent
 	 */
 	public String getAgent() {
 		return System.getProperty(AgentVars.AGENT_PROP, this.getHost());
 	}
-
+	
 	/**
 	 * @return the token for authentication
 	 */
 	public String getToken() {
 		return System.getProperty(AgentVars.TOKEN_PROP, null);
 	}
-
+	
 	/**
 	 * updates the templatename
 	 *
@@ -180,22 +182,22 @@ public class AgentState {
 	 */
 	public void updateTemplate(String templateName) {
 		Charset charset = StandardCharsets.UTF_8;
-		if(this.getTemplate().equals(templateName)) {
+		if (this.getTemplate().equals(templateName)) {
 			return;
 		}
 		System.setProperty(AgentVars.TEMPLATE_PROP, templateName);
 		try {
 			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
-
+			
 			String content = new String(Files.readAllBytes(path), charset);
 			content = content.replaceAll("export TEMPLATE_NAME=\".*\"", "export TEMPLATE_NAME=\"" + templateName + "\"");
 			Files.write(path, content.getBytes(charset));
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			this.logger.error("Failed to write template name to env.sh", ex.getMessage());
 		}
-
+		
 	}
-
+	
 	/**
 	 * update host uuid
 	 *
@@ -203,25 +205,25 @@ public class AgentState {
 	 */
 	public void updateUuid(String uuid) {
 		Charset charset = StandardCharsets.UTF_8;
-		if(this.getUuid() != null) {
-			if(this.getUuid().equals(uuid)) {
+		if (this.getUuid() != null) {
+			if (this.getUuid().equals(uuid)) {
 				return;
 			}
 		}
 		System.setProperty(AgentVars.UUID_PROP, uuid);
 		try {
 			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
-
+			
 			String content = new String(Files.readAllBytes(path), charset);
-			if(content.contains(AgentVars.UUID_PROP)) {
+			if (content.contains(AgentVars.UUID_PROP)) {
 				content = content.replaceAll("export " + AgentVars.UUID_PROP + "=\".*\"", "export " + AgentVars.UUID_PROP + "=\"" + uuid + "\"");
 			} else {
 				content = content + "export " + AgentVars.UUID_PROP + "=\"" + uuid + "\"\n";
 			}
 			Files.write(path, content.getBytes(charset));
-		} catch(IOException ex) {
+		} catch (IOException ex) {
 			this.logger.error("Failed to write uuid to env.sh", ex.getMessage());
 		}
 	}
-
+	
 }
