@@ -19,6 +19,9 @@ package de.cinovo.cloudconductor.agent.jobs.handler.api;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.cinovo.cloudconductor.api.IRestPath;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
@@ -39,6 +42,9 @@ import de.cinovo.cloudconductor.api.model.Template;
  * 
  */
 public class AgentHandler extends AbstractApiHandler {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApiHandler.class);
+	
 	
 	/**
 	 * @param cloudconductorUrl the config server url
@@ -61,6 +67,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @param template the template name
 	 * @param host the host name
 	 * @param state the package state
+	 * @param uuid the UUID of the agent
 	 * @return changes to the package state
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
@@ -73,6 +80,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @param template the template name
 	 * @param host the host name
 	 * @param state the package state
+	 * @param uuid the UUID of the agent
 	 * @return changes to the service state
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
@@ -93,9 +101,9 @@ public class AgentHandler extends AbstractApiHandler {
 	
 	/**
 	 *
-	 * @param fileName
-	 * @return file filemode
-	 * @throws CloudConductorException
+	 * @param fileName the name of the file or directory
+	 * @return file file mode the file mode of the given file or directory
+	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public String getFileFileMode(String fileName) throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.FILE + IRestPath.FILE_DETAILS, fileName);
@@ -110,6 +118,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 */
 	public Template getTemplate(String template) throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.DEFAULT_NAME, template);
+		
 		return this._get(path, Template.class);
 	}
 	
@@ -118,6 +127,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @return the services of the template
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
+	// TODO update path
 	@SuppressWarnings("unchecked")
 	public Set<Service> getServices(String template) throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_SERVICE, template);
@@ -132,7 +142,9 @@ public class AgentHandler extends AbstractApiHandler {
 	@SuppressWarnings("unchecked")
 	public Set<SSHKey> getSSHKeys(String template) throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_SSHKEY, template);
-		return (Set<SSHKey>) this._get(path, this.getSetType(SSHKey.class));
+		AgentHandler.LOGGER.info("Get SSH keys from '" + path + "'...");
+		Object result = this._get(path, this.getSetType(SSHKey.class));
+		return (Set<SSHKey>) result;
 	}
 	
 	/**
@@ -140,6 +152,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	@SuppressWarnings("unchecked")
+	// TODO needed?
 	public Set<String> getAliveAgents() throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.AGENT);
 		return (Set<String>) this._get(path, this.getSetType(String.class));
@@ -148,11 +161,14 @@ public class AgentHandler extends AbstractApiHandler {
 	/**
 	 * @param template the template name
 	 * @param host the host name
+	 * @param agent the name of the agent
+	 * @param uuid the UUID of the agent
 	 * @return the agent options of the template
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public AgentOption heartBeat(String template, String host, String agent, String uuid) throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_HEART_BEAT, template, host, agent, uuid);
+		AgentHandler.LOGGER.info("Send heartbeat to '" + path + "'");
 		return this._get(path, AgentOption.class);
 	}
 	

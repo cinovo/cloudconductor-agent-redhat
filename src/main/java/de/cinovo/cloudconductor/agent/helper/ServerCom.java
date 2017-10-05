@@ -26,6 +26,8 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
@@ -51,6 +53,8 @@ import de.cinovo.cloudconductor.api.model.Template;
  * 
  */
 public class ServerCom {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServerCom.class);
 	
 	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
@@ -194,6 +198,7 @@ public class ServerCom {
 			String agentName = AgentState.info().getAgent();
 			return ServerCom.agent.heartBeat(template, host, agentName, uuid);
 		} catch (RuntimeException e) {
+			ServerCom.LOGGER.error("Error sending heart beat: ", e);
 			throw new CloudConductorException(e.getMessage());
 		}
 	}

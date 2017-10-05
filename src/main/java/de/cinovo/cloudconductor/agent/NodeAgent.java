@@ -49,20 +49,13 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	
 	private boolean checkServer() throws ServerConnectionException {
 		try {
-			ServerCom.isServerAlive();
-		} catch (CloudConductorException e) {
-			// this is still before the logger gets initialized
-			NodeAgent.LOGGER.warn("Initial server connection failed! Waiting for server and retrying in " + (AgentVars.WAIT_FOR_SERVER / 1000) + " seconds ...");
-			return false;
-		}
-		
-		try {
 			Template template = ServerCom.getTemplate();
 			if (template != null) {
 				return true;
 			}
 			throw new ServerConnectionException();
 		} catch (CloudConductorException e) {
+			NodeAgent.LOGGER.error("Error getting template from server: ", e);
 			throw new ServerConnectionException();
 		}
 	}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # the url and port of the cloudconductor. Try to avoid protocol prefixes.
-export CLOUDCONDUCTOR_URL="server:8090"
+export CLOUDCONDUCTOR_URL="localhost:8090"
 #the name of the template to use by this agent
 export TEMPLATE_NAME="template"
 #the protocol the agent might use for REST calls. Options: http or https.

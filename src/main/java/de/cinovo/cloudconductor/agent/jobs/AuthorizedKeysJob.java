@@ -60,7 +60,7 @@ public class AuthorizedKeysJob implements AgentJob {
 			try {
 				FileHelper.writeRootAuthorizedKeys(sshKeys);
 			} catch (IOException e) {
-				AuthorizedKeysJob.LOGGER.error("Couldn't write auhtorized keys for root.", e);
+				AuthorizedKeysJob.LOGGER.error("Couldn't write authorized keys for root.", e);
 				return;
 			}
 		}
