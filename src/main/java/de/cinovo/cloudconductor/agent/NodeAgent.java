@@ -69,7 +69,7 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 				result.put(AgentVars.YUM_NAME_PROP, AgentVars.YUM_NAME_PROP_DEFAULT);
 			}
 		} catch (RuntimeException | CloudConductorException e) {
-			NodeAgent.LOGGER.warn("Couldn't retrieve properties from config server");
+			NodeAgent.LOGGER.warn("Couldn't retrieve properties from config server", e);
 			result.put(AgentVars.YUM_NAME_PROP, AgentVars.YUM_NAME_PROP_DEFAULT);
 		}
 		return result;

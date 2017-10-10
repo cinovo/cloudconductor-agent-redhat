@@ -19,6 +19,7 @@ package de.cinovo.cloudconductor.agent.helper;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,7 @@ import de.cinovo.cloudconductor.agent.jobs.handler.api.ConfigValueHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
+import de.cinovo.cloudconductor.api.model.ConfigValue;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
 import de.cinovo.cloudconductor.api.model.SSHKey;
@@ -82,11 +84,21 @@ public class ServerCom {
 	 * @throws CloudConductorException error if retrieval fails
 	 */
 	public static Map<String, String> getConfig() throws CloudConductorException {
+		Map<String, String> configMap = new HashMap<>();
+		
 		try {
-			return ServerCom.config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME);
+			for (ConfigValue c : ServerCom.config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME)) {
+				if ((c.getService() != null) && c.getService().equals(AgentVars.SERVICE_NAME)) {
+					ServerCom.LOGGER.info("Add config: " + c.getKey() + ": " + c.getValue());
+					configMap.put(c.getKey(), (String) c.getValue());
+				}
+			}
 		} catch (RuntimeException e) {
+			ServerCom.LOGGER.error("Error getting config from server: ", e);
 			throw new CloudConductorException(e.getMessage());
 		}
+		
+		return configMap;
 	}
 	
 	/**
