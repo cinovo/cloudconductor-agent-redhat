@@ -62,7 +62,7 @@ public interface AgentVars {
 	 */
 	String YUM_NAME_PROP = "nodeagent.repo.name";
 	/**
-	 * derfault yum repo name
+	 * default yum repo name
 	 */
 	String YUM_NAME_PROP_DEFAULT = "cinovo";
 	
@@ -91,7 +91,7 @@ public interface AgentVars {
 	 * relative path to the script folder
 	 */
 	String SCRIPTFOLDER = "scripts/";
-
+	
 	/**
 	 * property for agent / host uuid
 	 */
@@ -104,5 +104,5 @@ public interface AgentVars {
 	 * default agent communication protocol
 	 */
 	String COMMUNICATION_PROTOCOL_DEFAULT = "http";
-
+	
 }

@@ -20,10 +20,6 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-import com.google.common.io.Files;
-import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.model.SSHKey;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,6 +35,15 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collection;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Files;
+
+import de.cinovo.cloudconductor.api.model.Repo;
+import de.cinovo.cloudconductor.api.model.RepoMirror;
+import de.cinovo.cloudconductor.api.model.SSHKey;
+
 /**
  * Copyright 2013 Cinovo AG<br>
  * <br>
@@ -48,17 +53,31 @@ import java.util.Set;
  */
 public class FileHelper {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
+	
+	
 	private FileHelper() {
 		// prevent initialization
 	}
 	
 	/**
-	 * @throws CloudConductorException thrown if yum url retrieval fails
+	 * @param repoToWrite the repository for which a yum repo file should be written
 	 * @throws IOException thrown if file couln't be generated
 	 */
-	public static void writeYumRepo() throws CloudConductorException, IOException {
-		String yumName = System.getProperty(AgentVars.YUM_NAME_PROP);
+	public static void writeYumRepo(Repo repoToWrite) throws IOException {
+		String yumName = repoToWrite.getName();
+		
+		String baseurl = null;
+		Long mirrorIndex = repoToWrite.getPrimaryMirror();
+		for (RepoMirror mirror : repoToWrite.getMirrors()) {
+			if (mirror.getId().equals(mirrorIndex)) {
+				baseurl = mirror.getPath();
+			}
+		}
+		
 		String fileName = AgentVars.YUM_REPO_FOLDER + yumName + AgentVars.YUM_REPO_ENDING;
+		FileHelper.LOGGER.info("Write yum repo file '" + fileName + "'...");
+		
 		try (FileWriter writer = new FileWriter(new File(fileName))) {
 			writer.append("[");
 			writer.append(yumName);
@@ -69,7 +88,7 @@ public class FileHelper {
 			writer.append("failovermethod=priority");
 			writer.append(System.lineSeparator());
 			writer.append("baseurl=");
-			writer.append(ServerCom.getYumPath());
+			writer.append(baseurl);
 			writer.append(System.lineSeparator());
 			writer.append("enabled=0");
 			writer.append(System.lineSeparator());

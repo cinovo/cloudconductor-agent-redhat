@@ -20,6 +20,7 @@ package de.cinovo.cloudconductor.agent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import de.cinovo.cloudconductor.agent.jobs.AgentJob;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
 import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import de.cinovo.cloudconductor.api.model.Repo;
 import de.cinovo.cloudconductor.api.model.Template;
 import de.taimos.daemon.DaemonLifecycleAdapter;
 
@@ -117,13 +119,23 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	 * yum initialization
 	 */
 	public void initYum() {
+		Set<Repo> repos;
 		try {
-			FileHelper.writeYumRepo();
-		} catch (CloudConductorException | IOException e) {
-			NodeAgent.LOGGER.error("Couldn't create yum repo file.", e);
+			repos = ServerCom.getRepos();
+		} catch (CloudConductorException e) {
+			NodeAgent.LOGGER.error("Error getting repositories for template: ", e);
 			return;
 		}
-		NodeAgent.LOGGER.info("Wrote yum repo");
+		
+		NodeAgent.LOGGER.info("Initialize " + repos.size() + " yum repos...");
+		
+		for (Repo repo : repos) {
+			try {
+				FileHelper.writeYumRepo(repo);
+			} catch (IOException e) {
+				NodeAgent.LOGGER.error("Error writing yum for '" + repo.getName() + "': ", e);
+			}
+		}
 	}
 	
 	@Override

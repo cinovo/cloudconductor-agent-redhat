@@ -28,6 +28,7 @@ import de.cinovo.cloudconductor.api.model.AgentOption;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
+import de.cinovo.cloudconductor.api.model.Repo;
 import de.cinovo.cloudconductor.api.model.SSHKey;
 import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
@@ -179,5 +180,16 @@ public class AgentHandler extends AbstractApiHandler {
 	public Boolean isServerAlive() throws CloudConductorException {
 		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_PING);
 		return this._get(path, Boolean.class);
+	}
+	
+	/**
+	 * @param templateName the name of the template
+	 * @return set of repos for the given template
+	 * @throws CloudConductorException Error indicating connection or data problems
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<Repo> getRepos(String templateName) throws CloudConductorException {
+		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_REPO, templateName);
+		return (Set<Repo>) this._get(path, this.getSetType(Repo.class));
 	}
 }

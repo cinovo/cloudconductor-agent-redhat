@@ -24,7 +24,7 @@ while getopts r:s:u: OPT; do
 			fi 
 			;;		
 		\?)
-			echo "Unknow command!" 1>&2
+			echo "Unknown command!" 1>&2
 			exit 1	
 			;;
     esac
@@ -44,7 +44,7 @@ if [ $? -eq 1 ]; then
     do
         service $element restart &> /dev/null
         if [ $? -gt 0 ]; then
-            echo "RESTART of $element failed. Attemp to stop and start seperately." 1>&2
+            echo "RESTART of $element failed. Attempt to stop and start separately." 1>&2
             service $element stop &> /dev/null
             prErr "STOPPING" $element
             service $element start &> /dev/null
@@ -74,7 +74,7 @@ else
             service $element restart &> /dev/null
         fi
         if [ $? -gt 0 ]; then
-            echo "RESTART of $element failed. Attemp to stop and start seperately." 1>&2
+            echo "RESTART of $element failed. Attempt to stop and start separately." 1>&2
             systemctl stop $element &> /dev/null
             if [ $? -eq 5 ]; then
                 service $element stop &> /dev/null

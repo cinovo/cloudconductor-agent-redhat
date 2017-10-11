@@ -52,6 +52,7 @@ public class ServiceHandler {
 		ServiceHandler.LOGGER.debug("Start ServiceHandler");
 		ServiceHandler.LOGGER.debug("ServiceHandler : Report running services");
 		List<String> runningServices = this.collectRunningServices();
+		
 		ServiceStates req = new ServiceStates(runningServices);
 		ServiceStatesChanges serviceChanges;
 		try {
@@ -60,6 +61,11 @@ public class ServiceHandler {
 			throw new ExecutionError(e);
 		}
 		
+		int nStart = serviceChanges.getToStart().size();
+		int nStop = serviceChanges.getToStop().size();
+		int nRestart = serviceChanges.getToRestart().size();
+		ServiceHandler.LOGGER.info("Service changes: " + nStart + " to be started, " + nStop + " to be stopped, " + nRestart + " to be restarted");
+		
 		// handle service changes
 		ServiceHandler.LOGGER.debug("ServiceHandler: Handle service changes");
 		ScriptExecutor serviceHandler = ScriptExecutor.generateServiceStateHandler(serviceChanges.getToRestart(), serviceChanges.getToStart(), serviceChanges.getToStop());
@@ -67,12 +73,13 @@ public class ServiceHandler {
 			serviceHandler.execute();
 		} catch (ExecutionError e) {
 			// just log the error but go on with execution
-			ServiceHandler.LOGGER.error(e.getMessage());
+			ServiceHandler.LOGGER.error("Error executing service handler: ", e);
 		}
 		
 		// notify server on current state
 		ServiceHandler.LOGGER.debug("ServiceHandler : Report running services again");
 		runningServices = this.collectRunningServices();
+		
 		req = new ServiceStates(runningServices);
 		try {
 			ServerCom.notifyRunningServices(req);
@@ -86,6 +93,7 @@ public class ServiceHandler {
 		Set<Service> services = null;
 		try {
 			services = ServerCom.getServices();
+			ServiceHandler.LOGGER.info("There are " + services.size() + " services registered.");
 		} catch (CloudConductorException e) {
 			throw new ExecutionError(e);
 		}
@@ -98,6 +106,8 @@ public class ServiceHandler {
 				runningServices.add(s.next().trim());
 			}
 		}
+		
+		ServiceHandler.LOGGER.info(runningServices.size() + " services are running.");
 		
 		return runningServices;
 	}

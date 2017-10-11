@@ -41,6 +41,7 @@ import de.cinovo.cloudconductor.api.model.ConfigFile;
 import de.cinovo.cloudconductor.api.model.ConfigValue;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
+import de.cinovo.cloudconductor.api.model.Repo;
 import de.cinovo.cloudconductor.api.model.SSHKey;
 import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
@@ -161,6 +162,20 @@ public class ServerCom {
 		try {
 			String template = AgentState.info().getTemplate();
 			return ServerCom.agent.getSSHKeys(template);
+		} catch (RuntimeException e) {
+			throw new CloudConductorException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * 
+	 * @return set of repos for current template
+	 * @throws CloudConductorException thrown if communication with cloudconductor failed
+	 */
+	public static Set<Repo> getRepos() throws CloudConductorException {
+		try {
+			String template = AgentState.info().getTemplate();
+			return ServerCom.agent.getRepos(template);
 		} catch (RuntimeException e) {
 			throw new CloudConductorException(e.getMessage());
 		}
