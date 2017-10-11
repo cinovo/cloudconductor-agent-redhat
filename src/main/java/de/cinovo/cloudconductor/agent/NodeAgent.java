@@ -133,7 +133,7 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 			try {
 				FileHelper.writeYumRepo(repo);
 			} catch (IOException e) {
-				NodeAgent.LOGGER.error("Error writing yum for '" + repo.getName() + "': ", e);
+				NodeAgent.LOGGER.error("Error writing yum repo for '" + repo.getName() + "': ", e);
 			}
 		}
 	}
