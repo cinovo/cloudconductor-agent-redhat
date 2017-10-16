@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.helper.AbstractExecutor;
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
@@ -35,6 +38,9 @@ import de.cinovo.cloudconductor.api.model.Service;
  * 
  */
 public class ScriptExecutor extends AbstractExecutor<String> {
+	
+	private Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
+	
 	
 	/**
 	 * @param remove packages to remove, separated by semicolon
@@ -156,12 +162,23 @@ public class ScriptExecutor extends AbstractExecutor<String> {
 		if (!scriptPath.exists()) {
 			throw new IOException("The script " + this.script + " couldn't be found");
 		}
+		if (!scriptPath.canRead()) {
+			throw new IOException("The script " + this.script + " couldn't be read");
+		}
+		if (!scriptPath.canExecute()) {
+			throw new IOException("The script " + this.script + " can not be executed");
+		}
 		StringBuilder scriptBuilder = new StringBuilder();
 		scriptBuilder.append(scriptPath.getAbsolutePath());
 		for (String s : this.args) {
-			scriptBuilder.append(" ");
-			scriptBuilder.append(s.trim());
+			if (s.length() > 0) {
+				scriptBuilder.append(" ");
+				scriptBuilder.append(s.trim());
+			}
 		}
+		
+		this.LOGGER.info("Execute '" + scriptBuilder.toString() + "'...");
+		
 		return Runtime.getRuntime().exec(scriptBuilder.toString());
 	}
 	

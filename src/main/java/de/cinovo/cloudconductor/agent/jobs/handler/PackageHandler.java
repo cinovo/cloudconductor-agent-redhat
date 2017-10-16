@@ -47,27 +47,27 @@ public class PackageHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		PackageHandler.LOGGER.debug("Start PackageHandler");
+		PackageHandler.LOGGER.info("Start PackageHandler");
 		
 		// report installed packages
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
 		
 		// TODO remove me
 		StringBuilder stInstall = new StringBuilder();
-		for (PackageVersion pv : packageChanges.getToErase()) {
-			stInstall.append(pv.getName() + " : " + pv.getVersion());
+		for (PackageVersion pv : packageChanges.getToInstall()) {
+			stInstall.append(pv.getName() + ": " + pv.getVersion() + ", ");
 		}
 		PackageHandler.LOGGER.info("Install: [" + stInstall.toString() + "]");
 		
 		StringBuilder stUpdate = new StringBuilder();
-		for (PackageVersion pv : packageChanges.getToErase()) {
-			stUpdate.append(pv.getName() + " : " + pv.getVersion() + ", ");
+		for (PackageVersion pv : packageChanges.getToUpdate()) {
+			stUpdate.append(pv.getName() + ": " + pv.getVersion() + ", ");
 		}
 		PackageHandler.LOGGER.info("Update: [" + stUpdate.toString() + "]");
 		
 		StringBuilder stDel = new StringBuilder();
 		for (PackageVersion pv : packageChanges.getToErase()) {
-			stDel.append(pv.getName() + " : " + pv.getVersion());
+			stDel.append(pv.getName() + ": " + pv.getVersion() + ", ");
 		}
 		PackageHandler.LOGGER.info("Delete: [" + stDel.toString() + "]");
 		
@@ -97,6 +97,7 @@ public class PackageHandler {
 		try {
 			return ServerCom.notifyInstalledPackages(installedPackages);
 		} catch (CloudConductorException e) {
+			PackageHandler.LOGGER.error("Error reporting installed packages: ", e);
 			throw new ExecutionError(e);
 		}
 	}
