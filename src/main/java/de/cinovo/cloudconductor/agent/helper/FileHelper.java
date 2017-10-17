@@ -175,34 +175,38 @@ public class FileHelper {
 	}
 	
 	
-	private static final String akFolder = "/root/.ssh/";
 	private static final String akFile = "authorized_keys";
-	private static final String akOwner = "root";
-	private static final String akGroup = "group";
 	private static final String akChmodFolder = "rwx------";
-	private static final String akChmodFile = "rw-------";
+	private static final String akChmodFile = "rw-r--r--";
+	
+	private static final String ROOT_USERDIR = "/root/";
 	
 	
 	/**
-	 * writes the authorized key file for root
+	 * Write the 'authorized_keys' file for a given user.
 	 * 
-	 * @param keys the keys to write to the authorized keys file
-	 * @throws IOException if something during write operation fails
+	 * @param username the name of the user
+	 * @param keys collection of SSH keys to write into the file
+	 * @throws IOException if crating or writing the file or its directories fails
 	 */
-	public static void writeRootAuthorizedKeys(Collection<SSHKey> keys) throws IOException {
-		File folder = new File(FileHelper.akFolder);
+	public static void writeAuthorizedKeysForUser(String username, Collection<SSHKey> keys) throws IOException {
+		String folderPath = FileHelper.getUserDirectory(username) + "/.ssh/";
+		
+		File folder = new File(folderPath);
 		if (!folder.exists()) {
 			folder.mkdirs();
-			FileHelper.chown(folder, FileHelper.akOwner, FileHelper.akGroup);
+			FileHelper.chown(folder, username, username);
 			FileHelper.chmod(folder, FileHelper.akChmodFolder);
 		}
 		
-		File file = new File(FileHelper.akFolder + FileHelper.akFile);
+		File file = new File(folderPath + FileHelper.akFile);
 		if (!file.exists()) {
 			Files.touch(file);
-			FileHelper.chown(folder, FileHelper.akOwner, FileHelper.akGroup);
-			FileHelper.chmod(folder, FileHelper.akChmodFile);
+			FileHelper.chown(file, username, username);
+			FileHelper.chmod(file, FileHelper.akChmodFile);
 		}
+		
+		FileHelper.LOGGER.info("Start to write into file '" + file + "'...");
 		try (FileWriter writer = new FileWriter(file)) {
 			for (SSHKey str : keys) {
 				writer.append(str.getKey());
@@ -210,6 +214,13 @@ public class FileHelper {
 			}
 			writer.flush();
 		}
+	}
+	
+	private static String getUserDirectory(String username) {
+		if (username.equals("root")) {
+			return FileHelper.ROOT_USERDIR;
+		}
+		return "/home/" + username;
 	}
 	
 	/**

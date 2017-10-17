@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
@@ -56,12 +58,21 @@ public class AuthorizedKeysJob implements AgentJob {
 			AuthorizedKeysJob.LOGGER.error("Couldn't retrieve ssh keys from server.", e);
 			return;
 		}
+		
 		if (!sshKeys.isEmpty()) {
-			try {
-				FileHelper.writeRootAuthorizedKeys(sshKeys);
-			} catch (IOException e) {
-				AuthorizedKeysJob.LOGGER.error("Couldn't write authorized keys for root.", e);
-				return;
+			ArrayListMultimap<String, SSHKey> userKeyMap = ArrayListMultimap.create();
+			for (SSHKey key : sshKeys) {
+				userKeyMap.put(key.getUsername(), key);
+			}
+			
+			// write file for each user
+			for (String username : userKeyMap.keySet()) {
+				try {
+					FileHelper.writeAuthorizedKeysForUser(username, userKeyMap.get(username));
+				} catch (IOException e) {
+					AuthorizedKeysJob.LOGGER.error("Couldn't write authorized keys for user '" + username + "'", e);
+					return;
+				}
 			}
 		}
 	}
