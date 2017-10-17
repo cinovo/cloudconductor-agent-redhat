@@ -63,11 +63,7 @@ public class DefaultJob implements AgentJob {
 			ServiceHandler serviceHandler = new ServiceHandler();
 			serviceHandler.run();
 		} catch (ExecutionError e) {
-			if (e.getCause() instanceof CloudConductorException) {
-				DefaultJob.LOGGER.error(e.getMessage(), e);
-			} else {
-				DefaultJob.LOGGER.error(e.getMessage());
-			}
+			DefaultJob.LOGGER.error("Error handling services: " + e.getMessage(), e);
 		}
 	}
 	
@@ -77,9 +73,9 @@ public class DefaultJob implements AgentJob {
 			packageHandler.run();
 		} catch (ExecutionError e) {
 			if (e.getCause() instanceof CloudConductorException) {
-				DefaultJob.LOGGER.error(e.getMessage(), e);
+				DefaultJob.LOGGER.error("Error handling packages: " + e.getMessage(), e);
 			} else {
-				DefaultJob.LOGGER.error(e.getMessage());
+				DefaultJob.LOGGER.error("Error handling packages: " + e.getMessage());
 			}
 		}
 	}

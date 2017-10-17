@@ -71,6 +71,10 @@ public interface AgentVars {
 	 */
 	String YUM_REPO_FOLDER = "/etc/yum.repos.d/";
 	/**
+	 * the prefix for yum repo files created by cloudconductor
+	 */
+	String YUM_REPO_PREFIX = "cc_";
+	/**
 	 * file ending for yum repo definition files
 	 */
 	String YUM_REPO_ENDING = ".repo";

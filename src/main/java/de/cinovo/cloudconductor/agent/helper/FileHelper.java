@@ -74,8 +74,9 @@ public class FileHelper {
 				baseurl = mirror.getPath();
 			}
 		}
+		FileHelper.LOGGER.info("Found baseurl '" + baseurl + "'");
 		
-		String fileName = AgentVars.YUM_REPO_FOLDER + yumName + AgentVars.YUM_REPO_ENDING;
+		String fileName = AgentVars.YUM_REPO_FOLDER + AgentVars.YUM_REPO_PREFIX + yumName + AgentVars.YUM_REPO_ENDING;
 		FileHelper.LOGGER.info("Write yum repo file '" + fileName + "'...");
 		
 		try (FileWriter writer = new FileWriter(new File(fileName))) {

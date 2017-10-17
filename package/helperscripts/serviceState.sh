@@ -1,5 +1,5 @@
 #!/bin/bash
-which systemctl
+which systemctl 2> /dev/null
 
 if [ $? -eq 1 ]
 then

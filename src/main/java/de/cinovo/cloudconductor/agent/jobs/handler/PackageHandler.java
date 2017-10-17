@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.IExecutor;
 import de.cinovo.cloudconductor.agent.executors.InstalledPackages;
+import de.cinovo.cloudconductor.agent.executors.ScriptExecutor;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.PackageState;
@@ -72,10 +73,8 @@ public class PackageHandler {
 		PackageHandler.LOGGER.info("Delete: [" + stDel.toString() + "]");
 		
 		// handle package changes
-		// TODO re-enable execution
-		// ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(packageChanges.getToErase(), packageChanges.getToInstall(),
-		// packageChanges.getToUpdate());
-		// pkgHandler.execute();
+		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(packageChanges.getToErase(), packageChanges.getToInstall(), packageChanges.getToUpdate());
+		pkgHandler.execute();
 		
 		// re-report installed packages
 		this.reportInstalledPackages();
@@ -92,7 +91,6 @@ public class PackageHandler {
 		for (PackageVersion pv : installedPackages.getInstalledRpms()) {
 			sb.append(pv.getName() + ":" + pv.getVersion() + ", ");
 		}
-		PackageHandler.LOGGER.info("Installed: " + sb.toString());
 		
 		try {
 			return ServerCom.notifyInstalledPackages(installedPackages);
