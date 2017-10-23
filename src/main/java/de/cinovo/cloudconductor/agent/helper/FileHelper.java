@@ -38,6 +38,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
 import de.cinovo.cloudconductor.api.model.Repo;
@@ -77,26 +79,50 @@ public class FileHelper {
 		FileHelper.LOGGER.info("Found baseurl '" + baseurl + "'");
 		
 		String fileName = AgentVars.YUM_REPO_FOLDER + AgentVars.YUM_REPO_PREFIX + yumName + AgentVars.YUM_REPO_ENDING;
-		FileHelper.LOGGER.info("Write yum repo file '" + fileName + "'...");
 		
-		try (FileWriter writer = new FileWriter(new File(fileName))) {
-			writer.append("[");
-			writer.append(yumName);
-			writer.append("]");
-			writer.append(System.lineSeparator());
-			writer.append("name=" + yumName + " deploy repository");
-			writer.append(System.lineSeparator());
-			writer.append("failovermethod=priority");
-			writer.append(System.lineSeparator());
-			writer.append("baseurl=");
-			writer.append(baseurl);
-			writer.append(System.lineSeparator());
-			writer.append("enabled=0");
-			writer.append(System.lineSeparator());
-			writer.append("metadata_expire=1h");
-			writer.append(System.lineSeparator());
-			writer.append("gpgcheck=0");
-			writer.append(System.lineSeparator());
+		StringBuilder repoStr = new StringBuilder();
+		repoStr.append("[");
+		repoStr.append(yumName);
+		repoStr.append("]");
+		repoStr.append(System.lineSeparator());
+		repoStr.append("name=" + yumName + " deploy repository");
+		repoStr.append(System.lineSeparator());
+		repoStr.append("failovermethod=priority");
+		repoStr.append(System.lineSeparator());
+		repoStr.append("baseurl=");
+		repoStr.append(baseurl);
+		repoStr.append(System.lineSeparator());
+		repoStr.append("enabled=0");
+		repoStr.append(System.lineSeparator());
+		repoStr.append("metadata_expire=1h");
+		repoStr.append(System.lineSeparator());
+		repoStr.append("gpgcheck=0");
+		repoStr.append(System.lineSeparator());
+		
+		// check whether file must be written
+		File yumRepoFile = new File(fileName);
+		if (yumRepoFile.exists()) {
+			HashCode checksumFile = FileHelper.getChecksum(yumRepoFile);
+			HashCode checksumString = FileHelper.getChecksum(repoStr.toString());
+			
+			if (checksumFile.equals(checksumString)) {
+				FileHelper.LOGGER.info("No Changes for repo file!");
+				return;
+			}
+		}
+		
+		FileHelper.LOGGER.info("Write yum repo file '" + fileName + "'...");
+		FileHelper.writeFile(fileName, repoStr.toString());
+	}
+	
+	/**
+	 * @param filePath the path of the file to write
+	 * @param content the string content to write
+	 * @throws IOException thrown if file could not be generated
+	 */
+	public static void writeFile(String filePath, String content) throws IOException {
+		try (FileWriter writer = new FileWriter(new File(filePath))) {
+			writer.append(content);
 			writer.flush();
 			writer.close();
 		}
@@ -259,5 +285,28 @@ public class FileHelper {
 			}
 		}
 		return s.toString();
+	}
+	
+	/**
+	 * 
+	 * @param content the content for which to compute the HashCode
+	 * @return HashCode of the given string content
+	 */
+	public static HashCode getChecksum(String content) {
+		return Hashing.md5().hashBytes(content.getBytes());
+	}
+	
+	/**
+	 * 
+	 * @param content the file for which the checksum should be computed
+	 * @return HashCode or null if an exception occurred reading the file
+	 */
+	public static HashCode getChecksum(File content) {
+		try {
+			return Files.hash(content, Hashing.md5());
+		} catch (IOException e) {
+			FileHelper.LOGGER.error("Error computing hash: ", e);
+			return null;
+		}
 	}
 }

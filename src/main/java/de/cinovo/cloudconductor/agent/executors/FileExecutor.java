@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
@@ -88,8 +87,10 @@ public class FileExecutor implements IExecutor<Set<String>> {
 					this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
 				}
 			} else {
+				
+				// in case config file is a file
 				File localFile = new File(configFile.getTargetPath());
-				HashCode localFileHash = this.getChecksum(localFile);
+				HashCode localFileHash = FileHelper.getChecksum(localFile);
 				
 				String serverFile;
 				try {
@@ -98,7 +99,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 					FileExecutor.LOGGER.error("Error getting file data for config file '" + configFile.getName() + "': ", e);
 					continue;
 				}
-				HashCode serverFileHash = this.getChecksum(serverFile);
+				HashCode serverFileHash = FileHelper.getChecksum(serverFile);
 				
 				boolean changeOccured = false;
 				
@@ -159,19 +160,6 @@ public class FileExecutor implements IExecutor<Set<String>> {
 	@Override
 	public boolean failed() {
 		return !this.errors.toString().trim().isEmpty();
-	}
-	
-	private HashCode getChecksum(String content) {
-		return Hashing.md5().hashBytes(content.getBytes());
-	}
-	
-	private HashCode getChecksum(File content) {
-		try {
-			return Files.hash(content, Hashing.md5());
-		} catch (IOException e) {
-			FileExecutor.LOGGER.error("Error computing hash: ", e);
-			return null;
-		}
 	}
 	
 	private void checkDirPermOwner(File dirs, String fm, String owner, String group) {
