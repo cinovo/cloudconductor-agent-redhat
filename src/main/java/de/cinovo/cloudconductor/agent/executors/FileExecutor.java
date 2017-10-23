@@ -73,18 +73,20 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		this.errors = new StringBuilder();
 		
 		for (ConfigFile configFile : this.files) {
+			boolean changeOccured = false;
+			
 			if (configFile.isDirectory()) {
 				File dirs = new File(configFile.getTargetPath());
 				String dirMode = configFile.getFileMode();
 				
 				if (!dirs.exists()) {
-					
 					// create missing directories
 					if (dirs.mkdirs()) {
+						changeOccured = true;
 						this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
 					}
 				} else {
-					this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
+					changeOccured = this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
 				}
 			} else {
 				
@@ -100,8 +102,6 @@ public class FileExecutor implements IExecutor<Set<String>> {
 					continue;
 				}
 				HashCode serverFileHash = FileHelper.getChecksum(serverFile);
-				
-				boolean changeOccured = false;
 				
 				if (!serverFileHash.equals(localFileHash)) {
 					try {
@@ -143,11 +143,13 @@ public class FileExecutor implements IExecutor<Set<String>> {
 					this.errors.append(e.getMessage());
 					this.errors.append(System.lineSeparator());
 				}
-				
-				// set services to restart
-				if (configFile.isReloadable() && changeOccured) {
-					this.restart.addAll(configFile.getDependentServices());
-				}
+			}
+			
+			// set services to restart
+			if (configFile.isReloadable() && changeOccured) {
+				Set<String> servicesToRestart = configFile.getDependentServices();
+				this.restart.addAll(servicesToRestart);
+				FileExecutor.LOGGER.info("Config file changed, " + servicesToRestart.size() + " services have to be restarted!");
 			}
 		}
 		
@@ -162,11 +164,14 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		return !this.errors.toString().trim().isEmpty();
 	}
 	
-	private void checkDirPermOwner(File dirs, String fm, String owner, String group) {
+	private boolean checkDirPermOwner(File dirs, String fm, String owner, String group) {
+		boolean changeOccured = false;
+		
 		String fileMode = FileHelper.fileModeIntToString(fm);
 		try {
 			if (!FileHelper.isFileMode(dirs, fileMode)) {
 				FileHelper.chmod(dirs, fileMode);
+				changeOccured = true;
 			}
 		} catch (IOException e) {
 			this.errors.append("could not check/change directory mode");
@@ -177,11 +182,14 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		try {
 			if (!FileHelper.isFileOwner(dirs, owner, group)) {
 				FileHelper.chown(dirs, owner, group);
+				changeOccured = true;
 			}
 		} catch (IOException e) {
 			this.errors.append("could not check/change owner / group");
 			this.errors.append(System.lineSeparator());
 		}
+		
+		return changeOccured;
 	}
 	
 }
