@@ -82,7 +82,7 @@ public class OptionHandler {
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEATE FILE MNGMENT");
+				OptionHandler.LOGGER.info("OptionHandler: REPEAT FILE MNGMENT");
 				SchedulerService.instance.resetTask(FilesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
 			}
 			break;
@@ -101,7 +101,7 @@ public class OptionHandler {
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getPackageManagementTimer() != oldOptions.getPackageManagementTimer()) || (this.newOptions.getPackageManagementTimerUnit().equals(oldOptions.getPackageManagementTimerUnit()))) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEATE PKG MNGMENT");
+				OptionHandler.LOGGER.info("OptionHandler: REPEAT PKG MNGMENT");
 				SchedulerService.instance.resetTask(DefaultJob.JOB_NAME, this.newOptions.getPackageManagementTimer(), this.newOptions.getPackageManagementTimerUnit());
 			}
 			break;

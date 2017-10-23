@@ -177,7 +177,7 @@ public class ScriptExecutor extends AbstractExecutor<String> {
 			}
 		}
 		
-		this.LOGGER.info("Execute '" + scriptBuilder.toString() + "'...");
+		this.LOGGER.debug("Execute '" + scriptBuilder.toString() + "'");
 		
 		return Runtime.getRuntime().exec(scriptBuilder.toString());
 	}

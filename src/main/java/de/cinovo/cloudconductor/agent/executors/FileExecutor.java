@@ -26,6 +26,9 @@ import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -45,6 +48,8 @@ import de.cinovo.cloudconductor.api.model.ConfigFile;
  * 
  */
 public class FileExecutor implements IExecutor<Set<String>> {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileExecutor.class);
 	
 	private Set<ConfigFile> files;
 	private StringBuilder errors;
@@ -68,62 +73,80 @@ public class FileExecutor implements IExecutor<Set<String>> {
 	public IExecutor<Set<String>> execute() throws ExecutionError {
 		this.errors = new StringBuilder();
 		
-		for (ConfigFile file : this.files) {
-			File localFile = new File(file.getTargetPath());
-			HashCode localFileHash = this.getChecksum(localFile);
-			String serverFile;
-			try {
-				serverFile = ServerCom.getFileData(file);
-			} catch (TransformationErrorException | CloudConductorException e) {
-				continue;
-			}
-			HashCode serverFileHash = this.getChecksum(serverFile);
-			
-			boolean changeOccured = false;
-			
-			if (!serverFileHash.equals(localFileHash)) {
+		for (ConfigFile configFile : this.files) {
+			if (configFile.isDirectory()) {
+				File dirs = new File(configFile.getTargetPath());
+				String dirMode = configFile.getFileMode();
+				
+				if (!dirs.exists()) {
+					
+					// create missing directories
+					if (dirs.mkdirs()) {
+						this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
+					}
+				} else {
+					this.checkDirPermOwner(dirs, dirMode, configFile.getOwner(), configFile.getGroup());
+				}
+			} else {
+				File localFile = new File(configFile.getTargetPath());
+				HashCode localFileHash = this.getChecksum(localFile);
+				
+				String serverFile;
 				try {
-					Files.createParentDirs(localFile);
-					Files.write(serverFile, localFile, Charset.forName("UTF-8"));
-					changeOccured = true;
-				} catch (IOException e) {
-					// add error to exception list
-					this.errors.append("Failed to write file: " + localFile.getAbsolutePath());
-					this.errors.append(System.lineSeparator());
-					// just skip this file
+					serverFile = ServerCom.getFileData(configFile);
+				} catch (TransformationErrorException | CloudConductorException e) {
+					FileExecutor.LOGGER.error("Error getting file data for config file '" + configFile.getName() + "': ", e);
 					continue;
 				}
-			}
-			
-			// set file owner and group
-			try {
-				if (!FileHelper.isFileOwner(localFile, file.getOwner(), file.getGroup())) {
-					FileHelper.chown(localFile, file.getOwner(), file.getGroup());
-					changeOccured = true;
+				HashCode serverFileHash = this.getChecksum(serverFile);
+				
+				boolean changeOccured = false;
+				
+				if (!serverFileHash.equals(localFileHash)) {
+					try {
+						FileExecutor.LOGGER.info("Update config file '" + configFile.getName() + "'...");
+						Files.createParentDirs(localFile);
+						Files.write(serverFile, localFile, Charset.forName("UTF-8"));
+						changeOccured = true;
+					} catch (IOException e) {
+						// add error to exception list
+						this.errors.append("Failed to write file: " + localFile.getAbsolutePath());
+						this.errors.append(System.lineSeparator());
+						// just skip this file
+						continue;
+					}
 				}
-			} catch (IOException e) {
-				this.errors.append("Failed to set user and/or group for file: " + localFile.getAbsolutePath());
-				this.errors.append(System.lineSeparator());
-			}
-			
-			// set file mode
-			try {
-				String fileMode = FileHelper.fileModeIntToString(ServerCom.getFileMode(file.getName()));
-				if (!FileHelper.isFileMode(localFile, fileMode)) {
-					FileHelper.chmod(localFile, fileMode);
-					changeOccured = true;
+				
+				// set file owner and group
+				try {
+					if (!FileHelper.isFileOwner(localFile, configFile.getOwner(), configFile.getGroup())) {
+						FileHelper.chown(localFile, configFile.getOwner(), configFile.getGroup());
+						changeOccured = true;
+					}
+				} catch (IOException e) {
+					this.errors.append("Failed to set user and/or group for file: " + localFile.getAbsolutePath());
+					this.errors.append(System.lineSeparator());
 				}
-			} catch (IOException e) {
-				this.errors.append("Failed to set chmod for file: " + localFile.getAbsolutePath());
-				this.errors.append(System.lineSeparator());
-			} catch (CloudConductorException e){
-				this.errors.append(e.getMessage());
-				this.errors.append(System.lineSeparator());
-			}
-			
-			// set services to restart
-			if (file.isReloadable() && changeOccured) {
-				this.restart.addAll(file.getDependentServices());
+				
+				// set file mode
+				try {
+					String fileMode = FileHelper.fileModeIntToString(ServerCom.getFileMode(configFile.getName()));
+					if (!FileHelper.isFileMode(localFile, fileMode)) {
+						FileHelper.chmod(localFile, fileMode);
+						changeOccured = true;
+					}
+				} catch (IOException e) {
+					this.errors.append("Failed to set chmod for file: " + localFile.getAbsolutePath());
+					this.errors.append(System.lineSeparator());
+				} catch (CloudConductorException e) {
+					this.errors.append(e.getMessage());
+					this.errors.append(System.lineSeparator());
+				}
+				
+				// set services to restart
+				if (configFile.isReloadable() && changeOccured) {
+					this.restart.addAll(configFile.getDependentServices());
+				}
 			}
 		}
 		
@@ -132,8 +155,6 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		}
 		return this;
 	}
-	
-
 	
 	@Override
 	public boolean failed() {
@@ -148,8 +169,30 @@ public class FileExecutor implements IExecutor<Set<String>> {
 		try {
 			return Files.hash(content, Hashing.md5());
 		} catch (IOException e) {
-			// should never happen, if it does-> leave checksum empty
+			FileExecutor.LOGGER.error("Error computing hash: ", e);
 			return null;
+		}
+	}
+	
+	private void checkDirPermOwner(File dirs, String fm, String owner, String group) {
+		String fileMode = FileHelper.fileModeIntToString(fm);
+		try {
+			if (!FileHelper.isFileMode(dirs, fileMode)) {
+				FileHelper.chmod(dirs, fileMode);
+			}
+		} catch (IOException e) {
+			this.errors.append("could not check/change directory mode");
+			this.errors.append(System.lineSeparator());
+		}
+		
+		// check file owner
+		try {
+			if (!FileHelper.isFileOwner(dirs, owner, group)) {
+				FileHelper.chown(dirs, owner, group);
+			}
+		} catch (IOException e) {
+			this.errors.append("could not check/change owner / group");
+			this.errors.append(System.lineSeparator());
 		}
 	}
 	

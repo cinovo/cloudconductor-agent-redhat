@@ -33,7 +33,9 @@ public class ConfigFileHandler {
 		Set<ConfigFile> configFiles;
 		try {
 			configFiles = ServerCom.getFiles();
+			ConfigFileHandler.LOGGER.info("Received " + configFiles.size() + " configuration files.");
 		} catch (CloudConductorException e) {
+			ConfigFileHandler.LOGGER.error("Error getting configuration files from server: ", e);
 			throw new ExecutionError(e);
 		}
 		
@@ -44,7 +46,7 @@ public class ConfigFileHandler {
 			files.execute();
 		} catch (ExecutionError e) {
 			// just log the error but go on with execution
-			ConfigFileHandler.LOGGER.error(e.getMessage());
+			ConfigFileHandler.LOGGER.error("Error handling files: " + e.getMessage(), e);
 		}
 		
 		Set<String> servicesToRestart = files.getResult();
