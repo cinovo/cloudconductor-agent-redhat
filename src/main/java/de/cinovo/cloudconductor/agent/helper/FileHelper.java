@@ -121,6 +121,7 @@ public class FileHelper {
 	 * @throws IOException thrown if file could not be generated
 	 */
 	public static void writeFile(String filePath, String content) throws IOException {
+		FileHelper.LOGGER.debug("Start to write into file '" + filePath + "'...");
 		try (FileWriter writer = new FileWriter(new File(filePath))) {
 			writer.append(content);
 			writer.flush();
@@ -232,13 +233,19 @@ public class FileHelper {
 			FileHelper.chmod(file, FileHelper.akChmodFile);
 		}
 		
-		FileHelper.LOGGER.info("Start to write into file '" + file + "'...");
-		try (FileWriter writer = new FileWriter(file)) {
-			for (SSHKey str : keys) {
-				writer.append(str.getKey());
-				writer.append(System.lineSeparator());
-			}
-			writer.flush();
+		StringBuilder keyStr = new StringBuilder();
+		for (SSHKey key : keys) {
+			keyStr.append(key.getKey());
+			keyStr.append(System.lineSeparator());
+		}
+		
+		HashCode checksumStr = FileHelper.getChecksum(keyStr.toString());
+		HashCode checksumFile = FileHelper.getChecksum(file);
+		
+		if (!checksumStr.equals(checksumFile)) {
+			FileHelper.writeFile(file.getAbsolutePath(), keyStr.toString());
+		} else {
+			FileHelper.LOGGER.info("authorized_keys did not change for user '" + username + "'");
 		}
 	}
 	
