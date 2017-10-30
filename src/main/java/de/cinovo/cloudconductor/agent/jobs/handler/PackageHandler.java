@@ -17,7 +17,10 @@ package de.cinovo.cloudconductor.agent.jobs.handler;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,38 +51,113 @@ public class PackageHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		PackageHandler.LOGGER.info("Start PackageHandler");
-		
-		// report installed packages
-		PackageStateChanges packageChanges = this.reportInstalledPackages();
-		
-		// TODO remove me
-		StringBuilder stInstall = new StringBuilder();
-		for (PackageVersion pv : packageChanges.getToInstall()) {
-			stInstall.append(pv.getName() + ": " + pv.getVersion() + ", ");
+		try {
+			PackageHandler.LOGGER.info("Start PackageHandler");
+			
+			// report installed packages
+			PackageStateChanges packageChanges = this.reportInstalledPackages();
+			PackageHandler.LOGGER.info("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
+			
+			Map<String, PackageStateChanges> changesByRepo = this.getChangesByRepo(packageChanges);
+			PackageHandler.LOGGER.info("Package changes for " + changesByRepo.size() + " repos");
+			
+			// executed package changes for each repository
+			for (Map.Entry<String, PackageStateChanges> changes : changesByRepo.entrySet()) {
+				String repoName = changes.getKey();
+				PackageHandler.LOGGER.info("Execute changes on repo '" + repoName + "'");
+				
+				List<PackageVersion> toDelete = changes.getValue().getToErase();
+				PackageHandler.LOGGER.info("Delete : " + toDelete.toString());
+				
+				List<PackageVersion> toInstall = changes.getValue().getToInstall();
+				PackageHandler.LOGGER.info("Install: " + toInstall.toString());
+				
+				List<PackageVersion> toUpdate = changes.getValue().getToUpdate();
+				PackageHandler.LOGGER.info("Update: " + toUpdate.toString());
+				
+				ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName, toDelete, toInstall, toUpdate);
+				pkgHandler.execute();
+			}
+			
+			// re-report installed packages
+			this.reportInstalledPackages();
+			
+			PackageHandler.LOGGER.debug("Finished PackageHandler");
+		} catch (Exception e) {
+			PackageHandler.LOGGER.error("Error handling packages: ", e);
+			throw e;
 		}
-		PackageHandler.LOGGER.info("Install: [" + stInstall.toString() + "]");
+	}
+	
+	private Map<String, PackageStateChanges> getChangesByRepo(PackageStateChanges allChanges) {
+		HashMap<String, PackageStateChanges> changesByRepo = new HashMap<>();
 		
-		StringBuilder stUpdate = new StringBuilder();
-		for (PackageVersion pv : packageChanges.getToUpdate()) {
-			stUpdate.append(pv.getName() + ": " + pv.getVersion() + ", ");
+		for (PackageVersion pvToInstall : allChanges.getToInstall()) {
+			
+			// first find out which repo should actually be used
+			String repoToUse = null;
+			for (String repo : pvToInstall.getRepos()) {
+				repoToUse = repo;
+				
+				if (changesByRepo.containsKey(repo)) {
+					break;
+				}
+			}
+			
+			// add package version for selected repo
+			if (changesByRepo.containsKey(repoToUse)) {
+				changesByRepo.get(repoToUse).getToInstall().add(pvToInstall);
+			} else {
+				List<PackageVersion> toInstall = new ArrayList<>();
+				toInstall.add(pvToInstall);
+				changesByRepo.put(repoToUse, new PackageStateChanges(toInstall, new ArrayList<>(), new ArrayList<>()));
+			}
 		}
-		PackageHandler.LOGGER.info("Update: [" + stUpdate.toString() + "]");
 		
-		StringBuilder stDel = new StringBuilder();
-		for (PackageVersion pv : packageChanges.getToErase()) {
-			stDel.append(pv.getName() + ": " + pv.getVersion() + ", ");
+		// handle package versions to be updated
+		for (PackageVersion pvToUpdate : allChanges.getToUpdate()) {
+			String repoToUse = null;
+			for (String repo : pvToUpdate.getRepos()) {
+				repoToUse = repo;
+				
+				if (changesByRepo.containsKey(repo)) {
+					break;
+				}
+			}
+			
+			// add package version for selected repo
+			if (changesByRepo.containsKey(repoToUse)) {
+				changesByRepo.get(repoToUse).getToUpdate().add(pvToUpdate);
+			} else {
+				List<PackageVersion> toUpdate = new ArrayList<>();
+				toUpdate.add(pvToUpdate);
+				changesByRepo.put(repoToUse, new PackageStateChanges(new ArrayList<>(), toUpdate, new ArrayList<>()));
+			}
 		}
-		PackageHandler.LOGGER.info("Delete: [" + stDel.toString() + "]");
 		
-		// handle package changes
-		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(packageChanges.getToErase(), packageChanges.getToInstall(), packageChanges.getToUpdate());
-		pkgHandler.execute();
+		// handle package versions to be deleted
+		for (PackageVersion pvToDelete : allChanges.getToErase()) {
+			PackageHandler.LOGGER.info("Package Version: " + pvToDelete.toString());
+			String repoToUse = null;
+			for (String repo : pvToDelete.getRepos()) {
+				repoToUse = repo;
+				
+				if (changesByRepo.containsKey(repo)) {
+					break;
+				}
+			}
+			
+			// add package version for selected repo
+			if (changesByRepo.containsKey(repoToUse)) {
+				changesByRepo.get(repoToUse).getToErase().add(pvToDelete);
+			} else {
+				List<PackageVersion> toDelete = new ArrayList<>();
+				toDelete.add(pvToDelete);
+				changesByRepo.put(repoToUse, new PackageStateChanges(new ArrayList<>(), new ArrayList<>(), toDelete));
+			}
+		}
 		
-		// re-report installed packages
-		this.reportInstalledPackages();
-		
-		PackageHandler.LOGGER.debug("Finished PackageHandler");
+		return changesByRepo;
 	}
 	
 	private PackageStateChanges reportInstalledPackages() throws ExecutionError {

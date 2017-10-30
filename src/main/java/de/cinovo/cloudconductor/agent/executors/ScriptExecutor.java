@@ -43,14 +43,15 @@ public class ScriptExecutor extends AbstractExecutor<String> {
 	
 	
 	/**
+	 * @param repo the name of the repository to use
 	 * @param remove packages to remove, separated by semicolon
 	 * @param install packages to install, separated by semicolon
 	 * @param update packages to update, separated by semicolon
 	 * @return the executor
 	 */
-	public static ScriptExecutor generatePackageHandler(Collection<PackageVersion> remove, Collection<PackageVersion> install, Collection<PackageVersion> update) {
+	public static ScriptExecutor generatePackageHandler(String repo, Collection<PackageVersion> remove, Collection<PackageVersion> install, Collection<PackageVersion> update) {
 		String scriptName = AgentVars.SCRIPT_YUM_HANDLER;
-		String repoArg = "-y " + System.getProperty(AgentVars.YUM_NAME_PROP);
+		String repoArg = "-y " + repo;
 		StringBuilder d = new StringBuilder();
 		StringBuilder i = new StringBuilder();
 		StringBuilder u = new StringBuilder();
