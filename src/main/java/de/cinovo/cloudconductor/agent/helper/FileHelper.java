@@ -76,7 +76,7 @@ public class FileHelper {
 				baseurl = mirror.getPath();
 			}
 		}
-		FileHelper.LOGGER.info("Found baseurl '" + baseurl + "'");
+		FileHelper.LOGGER.debug("Found baseurl '" + baseurl + "'");
 		
 		String fileName = AgentVars.YUM_REPO_FOLDER + AgentVars.YUM_REPO_PREFIX + yumName + AgentVars.YUM_REPO_ENDING;
 		
@@ -85,6 +85,7 @@ public class FileHelper {
 		repoStr.append(yumName);
 		repoStr.append("]");
 		repoStr.append(System.lineSeparator());
+		
 		repoStr.append("name=" + yumName + " deploy repository");
 		repoStr.append(System.lineSeparator());
 		repoStr.append("failovermethod=priority");
@@ -106,7 +107,7 @@ public class FileHelper {
 			HashCode checksumString = FileHelper.getChecksum(repoStr.toString());
 			
 			if (checksumFile.equals(checksumString)) {
-				FileHelper.LOGGER.info("No Changes for repo file!");
+				FileHelper.LOGGER.info("No Changes for repo file '" + fileName + "'!");
 				return;
 			}
 		}

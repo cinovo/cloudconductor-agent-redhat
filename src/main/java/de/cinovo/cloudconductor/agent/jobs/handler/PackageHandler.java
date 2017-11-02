@@ -51,42 +51,37 @@ public class PackageHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		try {
-			PackageHandler.LOGGER.info("Start PackageHandler");
+		PackageHandler.LOGGER.info("Start PackageHandler");
+		
+		// report installed packages
+		PackageStateChanges packageChanges = this.reportInstalledPackages();
+		PackageHandler.LOGGER.info("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
+		
+		Map<String, PackageStateChanges> changesByRepo = this.getChangesByRepo(packageChanges);
+		PackageHandler.LOGGER.info("Package changes for " + changesByRepo.size() + " repos");
+		
+		// executed package changes for each repository
+		for (Map.Entry<String, PackageStateChanges> changes : changesByRepo.entrySet()) {
+			String repoName = changes.getKey();
+			PackageHandler.LOGGER.info("Execute changes on repo '" + repoName + "'");
 			
-			// report installed packages
-			PackageStateChanges packageChanges = this.reportInstalledPackages();
-			PackageHandler.LOGGER.info("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
+			List<PackageVersion> toDelete = changes.getValue().getToErase();
+			PackageHandler.LOGGER.info("Delete : " + toDelete.toString());
 			
-			Map<String, PackageStateChanges> changesByRepo = this.getChangesByRepo(packageChanges);
-			PackageHandler.LOGGER.info("Package changes for " + changesByRepo.size() + " repos");
+			List<PackageVersion> toInstall = changes.getValue().getToInstall();
+			PackageHandler.LOGGER.info("Install: " + toInstall.toString());
 			
-			// executed package changes for each repository
-			for (Map.Entry<String, PackageStateChanges> changes : changesByRepo.entrySet()) {
-				String repoName = changes.getKey();
-				PackageHandler.LOGGER.info("Execute changes on repo '" + repoName + "'");
-				
-				List<PackageVersion> toDelete = changes.getValue().getToErase();
-				PackageHandler.LOGGER.info("Delete : " + toDelete.toString());
-				
-				List<PackageVersion> toInstall = changes.getValue().getToInstall();
-				PackageHandler.LOGGER.info("Install: " + toInstall.toString());
-				
-				List<PackageVersion> toUpdate = changes.getValue().getToUpdate();
-				PackageHandler.LOGGER.info("Update: " + toUpdate.toString());
-				
-				ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName, toDelete, toInstall, toUpdate);
-				pkgHandler.execute();
-			}
+			List<PackageVersion> toUpdate = changes.getValue().getToUpdate();
+			PackageHandler.LOGGER.info("Update: " + toUpdate.toString());
 			
-			// re-report installed packages
-			this.reportInstalledPackages();
-			
-			PackageHandler.LOGGER.debug("Finished PackageHandler");
-		} catch (Exception e) {
-			PackageHandler.LOGGER.error("Error handling packages: ", e);
-			throw e;
+			ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName, toDelete, toInstall, toUpdate);
+			pkgHandler.execute();
 		}
+		
+		// re-report installed packages
+		this.reportInstalledPackages();
+		
+		PackageHandler.LOGGER.debug("Finished PackageHandler");
 	}
 	
 	private Map<String, PackageStateChanges> getChangesByRepo(PackageStateChanges allChanges) {

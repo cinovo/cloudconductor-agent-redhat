@@ -17,23 +17,21 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.exceptions.ServerConnectionException;
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
-import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.AgentJob;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
+import de.cinovo.cloudconductor.agent.jobs.handler.RepoHandler;
 import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.model.Repo;
 import de.cinovo.cloudconductor.api.model.Template;
 import de.taimos.daemon.DaemonLifecycleAdapter;
 
@@ -80,7 +78,16 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	@Override
 	public void started() {
 		this.waitForServer();
-		this.initYum();
+		
+		// initialize yum repos
+		RepoHandler repoHandler = new RepoHandler();
+		try {
+			repoHandler.run();
+		} catch (ExecutionError e) {
+			NodeAgent.LOGGER.error("Error initializing yum repos: ", e);
+			return;
+		}
+		
 		// start timed jobs
 		for (Class<AgentJob> jobClazz : OptionHandler.jobRegistry) {
 			AgentJob job;
@@ -96,7 +103,6 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 			} catch (InstantiationException | IllegalAccessException e) {
 				NodeAgent.LOGGER.error("Couldn't start job: " + jobClazz.getName(), e);
 			}
-			
 		}
 	}
 	
@@ -112,29 +118,6 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 		} catch (ServerConnectionException e) {
 			NodeAgent.LOGGER.error("The Template " + AgentState.info().getTemplate() + " is not known by the server. I have no work to do. Quitting...");
 			System.exit(1);
-		}
-	}
-	
-	/**
-	 * yum initialization
-	 */
-	public void initYum() {
-		Set<Repo> repos;
-		try {
-			repos = ServerCom.getRepos();
-		} catch (CloudConductorException e) {
-			NodeAgent.LOGGER.error("Error getting repositories for template: ", e);
-			return;
-		}
-		
-		NodeAgent.LOGGER.info("Initialize " + repos.size() + " yum repos...");
-		
-		for (Repo repo : repos) {
-			try {
-				FileHelper.writeYumRepo(repo);
-			} catch (IOException e) {
-				NodeAgent.LOGGER.error("Error writing yum repo for '" + repo.getName() + "': ", e);
-			}
 		}
 	}
 	

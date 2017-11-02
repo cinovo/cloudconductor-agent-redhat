@@ -5,8 +5,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
+import de.cinovo.cloudconductor.agent.jobs.handler.RepoHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
 
@@ -37,6 +39,12 @@ public class HeartBeatJob implements AgentJob {
 		}
 		
 		new OptionHandler(newOptions).run();
+		
+		try {
+			new RepoHandler().run();
+		} catch (ExecutionError e) {
+			HeartBeatJob.LOGGER.error("Error updating repos: ", e);
+		}
 		HeartBeatJob.LOGGER.debug("Finished HeartBeatJob");
 	}
 	
