@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
@@ -34,16 +35,20 @@ public class HeartBeatJob implements AgentJob {
 		try {
 			newOptions = ServerCom.heartBeat();
 		} catch (CloudConductorException e) {
-			HeartBeatJob.LOGGER.error("Couldn't retrieve ssh keys from server.", e);
+			HeartBeatJob.LOGGER.error("Error getting options from server: ", e);
 			return;
 		}
 		
 		new OptionHandler(newOptions).run();
 		
 		try {
-			new RepoHandler().run();
+			if (AgentState.repoExecutionLock.tryLock()) {
+				new RepoHandler().run();
+			}
 		} catch (ExecutionError e) {
 			HeartBeatJob.LOGGER.error("Error updating repos: ", e);
+		} finally {
+			AgentState.repoExecutionLock.unlock();
 		}
 		HeartBeatJob.LOGGER.debug("Finished HeartBeatJob");
 	}

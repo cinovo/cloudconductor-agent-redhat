@@ -52,9 +52,10 @@ public class AgentState {
 	 */
 	public static final Lock filesExecutionLock = new ReentrantLock();
 	/**
-	 * a write lock for directory jobs
+	 * a write lock for repo changes
 	 */
-	public static final Lock directoryExecutionLock = new ReentrantLock();
+	public static final Lock repoExecutionLock = new ReentrantLock();
+	
 	private static AgentState instance;
 	private static VelocityContext velocityContext;
 	private static AgentOption options;

@@ -107,7 +107,7 @@ public class FileHelper {
 			HashCode checksumString = FileHelper.getChecksum(repoStr.toString());
 			
 			if (checksumFile.equals(checksumString)) {
-				FileHelper.LOGGER.info("No Changes for repo file '" + fileName + "'!");
+				FileHelper.LOGGER.info("No changes for repo file '" + fileName + "'.");
 				return;
 			}
 		}
@@ -246,7 +246,7 @@ public class FileHelper {
 		if (!checksumStr.equals(checksumFile)) {
 			FileHelper.writeFile(file.getAbsolutePath(), keyStr.toString());
 		} else {
-			FileHelper.LOGGER.info("authorized_keys did not change for user '" + username + "'");
+			FileHelper.LOGGER.info("No changes for authorized_keys of user '" + username + "'.");
 		}
 	}
 	

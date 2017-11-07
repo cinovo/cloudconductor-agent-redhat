@@ -93,9 +93,8 @@ public class ServiceHandler {
 		Set<Service> services = null;
 		try {
 			services = ServerCom.getServices();
-			ServiceHandler.LOGGER.info("There are " + services.size() + " services registered.");
 		} catch (CloudConductorException e) {
-			throw new ExecutionError(e);
+			throw new ExecutionError("Error getting services from server: ", e);
 		}
 		
 		List<String> runningServices = new ArrayList<String>();
@@ -106,8 +105,7 @@ public class ServiceHandler {
 				runningServices.add(s.next().trim());
 			}
 		}
-		
-		ServiceHandler.LOGGER.info(runningServices.size() + " services are running.");
+		ServiceHandler.LOGGER.info(services.size() + " services registered, " + runningServices.size() + " running.");
 		
 		return runningServices;
 	}

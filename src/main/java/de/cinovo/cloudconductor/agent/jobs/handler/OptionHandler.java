@@ -40,7 +40,7 @@ public class OptionHandler {
 	/**
 	 */
 	public void run() {
-		OptionHandler.LOGGER.info("Starting OptionHandler");
+		OptionHandler.LOGGER.debug("Starting OptionHandler");
 		AgentOption oldOptions = AgentState.getOptions();
 		AgentState.setOptions(this.newOptions);
 		
@@ -72,17 +72,17 @@ public class OptionHandler {
 		// FILE MANAGEMENT
 		switch (this.newOptions.getDoFileManagement()) {
 		case OFF:
-			OptionHandler.LOGGER.info("OptionHandler: STOP FILE MNGMENT");
+			OptionHandler.LOGGER.info("OptionHandler: STOP FILE MANAGEMENT");
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
 			break;
 		case ONCE:
-			OptionHandler.LOGGER.info("OptionHandler: ONCE FILE MNGMENT");
+			OptionHandler.LOGGER.info("OptionHandler: ONCE FILE MANAGEMENT");
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(FilesJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEAT FILE MNGMENT");
+				OptionHandler.LOGGER.info("OptionHandler: REPEAT FILE MANAGEMENT");
 				SchedulerService.instance.resetTask(FilesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
 			}
 			break;
@@ -91,22 +91,22 @@ public class OptionHandler {
 		// PACKAGE MANAGEMENT
 		switch (this.newOptions.getDoPackageManagement()) {
 		case OFF:
-			OptionHandler.LOGGER.info("OptionHandler: STOP PKG MNGMENT");
+			OptionHandler.LOGGER.info("OptionHandler: STOP PKG MANAGEMENT");
 			SchedulerService.instance.stop(DefaultJob.JOB_NAME);
 			break;
 		case ONCE:
-			OptionHandler.LOGGER.info("OptionHandler: ONCE PKG MNGMENT");
+			OptionHandler.LOGGER.info("OptionHandler: ONCE PKG MANAGEMENT");
 			SchedulerService.instance.stop(DefaultJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(DefaultJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getPackageManagementTimer() != oldOptions.getPackageManagementTimer()) || (this.newOptions.getPackageManagementTimerUnit().equals(oldOptions.getPackageManagementTimerUnit()))) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEAT PKG MNGMENT");
+				OptionHandler.LOGGER.info("OptionHandler: REPEAT PKG MANAGEMENT");
 				SchedulerService.instance.resetTask(DefaultJob.JOB_NAME, this.newOptions.getPackageManagementTimer(), this.newOptions.getPackageManagementTimerUnit());
 			}
 			break;
 		}
-		OptionHandler.LOGGER.info("Finished OptionHandler");
+		OptionHandler.LOGGER.debug("Finished OptionHandler");
 		
 	}
 }

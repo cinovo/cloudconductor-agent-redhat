@@ -40,7 +40,7 @@ public class FilesJob implements AgentJob {
 				AgentState.filesExecutionLock.unlock();
 			}
 		}
-		FilesJob.LOGGER.debug("Started FilesJob");
+		FilesJob.LOGGER.debug("Finished FilesJob");
 	}
 	
 	@Override

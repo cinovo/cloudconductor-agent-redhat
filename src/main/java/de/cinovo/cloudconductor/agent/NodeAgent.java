@@ -80,12 +80,15 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 		this.waitForServer();
 		
 		// initialize yum repos
-		RepoHandler repoHandler = new RepoHandler();
 		try {
-			repoHandler.run();
+			if (AgentState.repoExecutionLock.tryLock()) {
+				new RepoHandler().run();
+			}
 		} catch (ExecutionError e) {
 			NodeAgent.LOGGER.error("Error initializing yum repos: ", e);
 			return;
+		} finally {
+			AgentState.repoExecutionLock.unlock();
 		}
 		
 		// start timed jobs
