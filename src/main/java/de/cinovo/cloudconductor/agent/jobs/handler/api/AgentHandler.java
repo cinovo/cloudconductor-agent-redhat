@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import de.cinovo.cloudconductor.api.IRestPath;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
+import de.cinovo.cloudconductor.api.model.Authentication;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
@@ -55,13 +56,12 @@ public class AgentHandler extends AbstractApiHandler {
 	}
 	
 	/**
-	 * @param cloudconductorUrl the config server url
-	 * @param token the token
-	 * @param agent the agent
+	 * @param authToken the authentication token to use
+	 * @return the JWT
+	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
-	public AgentHandler(String cloudconductorUrl, String token, String agent) {
-		super(cloudconductorUrl);
-		this.setTokenMode(token, agent);
+	public String getJWT(String authToken) throws CloudConductorException {
+		return this._put("/auth", new Authentication(authToken), String.class);
 	}
 	
 	/**

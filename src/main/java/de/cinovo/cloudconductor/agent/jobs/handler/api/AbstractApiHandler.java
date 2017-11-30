@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.api.MediaType;
 import de.cinovo.cloudconductor.api.lib.exceptions.ClientErrorException;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
@@ -53,10 +54,6 @@ public abstract class AbstractApiHandler {
 	
 	/** the URL of the config server */
 	private String serverUrl;
-	private String username;
-	private String password;
-	private String token;
-	private String agent;
 	
 	
 	protected AbstractApiHandler(String cloudconductorUrl) {
@@ -187,13 +184,13 @@ public abstract class AbstractApiHandler {
 	 * @return the HTTP request
 	 */
 	protected final HTTPRequest request(String path) {
-		if ((this.username != null) && (this.password != null)) {
-			return WS.url(this.serverUrl + path).authBasic(this.username, this.password);
-		}
-		if (this.token != null) {
-			return WS.url(this.serverUrl + path).auth("TOKEN " + this.token + "_" + this.agent);
+		String jwt = AgentState.info().getJWT();
+		if (jwt != null) {
+			HTTPRequest req = WS.url(this.serverUrl + path).authBearer(jwt);
+			return req;
 		}
 		return WS.url(this.serverUrl + path);
+		
 	}
 	
 	/**
@@ -223,11 +220,14 @@ public abstract class AbstractApiHandler {
 	}
 	
 	protected static final void assertSuccess(String path, HttpResponse response) throws ClientErrorException, ServerErrorException {
+		String e = "";
 		switch (HttpStatusClass.get(response)) {
 		case CLIENT_ERROR:
-			throw new ClientErrorException(String.format("Client error (status: %d, request path: %s).", WS.getStatus(response), path));
+			e = String.format("Client error (status: %d, request path: %s): '%s'", WS.getStatus(response), path, WS.getResponseAsString(response));
+			throw new ClientErrorException(e);
 		case SERVER_ERROR:
-			throw new ServerErrorException(String.format("Server error (status: %d, request path: %s).", WS.getStatus(response), path));
+			e = String.format("Server error (status: %d, request path: %s): '%s'", WS.getStatus(response), path, WS.getResponseAsString(response));
+			throw new ServerErrorException(e);
 		default:
 			break;
 		}
@@ -257,24 +257,6 @@ public abstract class AbstractApiHandler {
 			}
 		}
 		return buffer.toString();
-	}
-	
-	/**
-	 * @param password the password to set
-	 * @param username the user name
-	 */
-	protected void setPasswordMode(String password, String username) {
-		this.password = password;
-		this.username = username;
-	}
-	
-	/**
-	 * @param token the token to set
-	 * @param agent the agent name
-	 */
-	protected void setTokenMode(String token, String agent) {
-		this.token = token;
-		this.agent = agent;
 	}
 	
 }

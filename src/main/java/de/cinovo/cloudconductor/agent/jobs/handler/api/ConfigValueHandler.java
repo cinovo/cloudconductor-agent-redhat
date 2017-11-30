@@ -58,7 +58,6 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 */
 	public ConfigValueHandler(String cloudconductorUrl, String token, String agent) {
 		super(cloudconductorUrl);
-		this.setTokenMode(token, agent);
 	}
 	
 	/**

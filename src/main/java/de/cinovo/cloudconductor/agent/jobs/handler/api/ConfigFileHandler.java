@@ -46,7 +46,6 @@ public class ConfigFileHandler extends DefaultRestHandler<ConfigFile> {
 	 */
 	public ConfigFileHandler(String cloudconductorUrl, String token, String agent) {
 		super(cloudconductorUrl);
-		this.setTokenMode(token, agent);
 	}
 	
 	@Override

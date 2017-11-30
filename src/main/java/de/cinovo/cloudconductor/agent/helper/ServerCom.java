@@ -59,13 +59,21 @@ public class ServerCom {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServerCom.class);
 	
-	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer());
 	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
 	
 	
 	private ServerCom() {
 		// prevent instantiation
+	}
+	
+	/**
+	 * @return the new JWT
+	 * @throws CloudConductorException if retrieval fails
+	 */
+	public static String getJWT() throws CloudConductorException {
+		return ServerCom.agent.getJWT(AgentState.info().getToken());
 	}
 	
 	/**

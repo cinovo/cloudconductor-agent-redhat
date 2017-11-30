@@ -45,7 +45,8 @@ public class OptionHandler {
 		AgentState.setOptions(this.newOptions);
 		
 		// option timer
-		if ((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || (this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
+		if ((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || //
+		(this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
 			OptionHandler.LOGGER.info("Reseting OPTIONTIMER TO " + this.newOptions.getAliveTimer() + ":" + this.newOptions.getAliveTimerUnit());
 			SchedulerService.instance.resetTask(HeartBeatJob.JOB_NAME, this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
 		}

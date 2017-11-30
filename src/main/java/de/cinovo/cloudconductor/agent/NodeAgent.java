@@ -28,6 +28,7 @@ import de.cinovo.cloudconductor.agent.exceptions.ServerConnectionException;
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.jobs.AgentJob;
+import de.cinovo.cloudconductor.agent.jobs.RefreshJWTJob;
 import de.cinovo.cloudconductor.agent.jobs.handler.OptionHandler;
 import de.cinovo.cloudconductor.agent.jobs.handler.RepoHandler;
 import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
@@ -48,6 +49,11 @@ public final class NodeAgent extends DaemonLifecycleAdapter {
 	
 	
 	private boolean checkServer() throws ServerConnectionException {
+		NodeAgent.LOGGER.info("Perform first authentication...");
+		new RefreshJWTJob().run();
+		
+		NodeAgent.LOGGER.info("Get template from server...");
+		
 		try {
 			Template template = ServerCom.getTemplate();
 			if (template != null) {

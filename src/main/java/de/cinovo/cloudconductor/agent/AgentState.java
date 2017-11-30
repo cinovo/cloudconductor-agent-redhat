@@ -61,6 +61,7 @@ public class AgentState {
 	private static AgentOption options;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String cloudconductor;
+	private String jwt;
 	
 	
 	private AgentState() {
@@ -174,6 +175,20 @@ public class AgentState {
 	 */
 	public String getToken() {
 		return System.getProperty(AgentVars.TOKEN_PROP, null);
+	}
+	
+	/**
+	 * @return the jwt to use
+	 */
+	public String getJWT() {
+		return this.jwt;
+	}
+	
+	/**
+	 * @param newJWT the new JWT to set
+	 */
+	public void setJWT(String newJWT) {
+		this.jwt = newJWT;
 	}
 	
 	/**
