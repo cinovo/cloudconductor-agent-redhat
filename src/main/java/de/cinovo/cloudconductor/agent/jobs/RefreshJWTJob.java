@@ -38,6 +38,7 @@ public class RefreshJWTJob implements AgentJob {
 		RefreshJWTJob.LOGGER.debug("Start RefreshJWTJob");
 		
 		String newJWT = null;
+		long period = 1000 * 60;
 		try {
 			newJWT = ServerCom.getJWT();
 			
@@ -45,19 +46,22 @@ public class RefreshJWTJob implements AgentJob {
 				JWTClaimsSet claimsSet = SignedJWT.parse(newJWT).getJWTClaimsSet();
 				AgentState.info().setJWT(newJWT);
 				
-				long period = JWTHelper.calcNextRefreshInMillis(claimsSet);
-				RefreshJWTJob.LOGGER.info("Authentication successful, refresh JWT in " + period + " ms");
-				SchedulerService.instance.executeOnce(new RefreshJWTJob(), period, TimeUnit.MILLISECONDS);
+				period = JWTHelper.calcNextRefreshInMillis(claimsSet);
+				RefreshJWTJob.LOGGER.info("Authentication successful!");
 			} else {
+				RefreshJWTJob.LOGGER.error("Authentication failed: Missing JWT!");
 				throw new CloudConductorException("Missing JWT!");
 			}
 		} catch (CloudConductorException e) {
 			RefreshJWTJob.LOGGER.error("Error refreshing JWT: ", e);
 		} catch (ParseException e) {
 			RefreshJWTJob.LOGGER.error("Error parsing new JWT '" + newJWT + "': ", e);
+		} finally {
+			SchedulerService.instance.executeOnce(new RefreshJWTJob(), period, TimeUnit.MILLISECONDS);
+			RefreshJWTJob.LOGGER.info("Scheduled next refresh of JWT in " + period + " ms");
+			
+			RefreshJWTJob.LOGGER.debug("Finished RefreshJWTJob");
 		}
-		
-		RefreshJWTJob.LOGGER.debug("Finished RefreshJWTJob");
 	}
 	
 	@Override
