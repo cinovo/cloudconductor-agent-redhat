@@ -19,7 +19,6 @@ package de.cinovo.cloudconductor.agent.jobs.handler.api;
 
 import java.util.Set;
 
-import de.cinovo.cloudconductor.api.IRestPath;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
 
@@ -39,18 +38,9 @@ public class ConfigFileHandler extends DefaultRestHandler<ConfigFile> {
 		super(cloudconductorUrl);
 	}
 	
-	/**
-	 * @param cloudconductorUrl the config server url
-	 * @param token the token
-	 * @param agent the agent
-	 */
-	public ConfigFileHandler(String cloudconductorUrl, String token, String agent) {
-		super(cloudconductorUrl);
-	}
-	
 	@Override
 	protected String getDefaultPath() {
-		return IRestPath.FILE;
+		return "/file";
 	}
 	
 	@Override
@@ -64,7 +54,7 @@ public class ConfigFileHandler extends DefaultRestHandler<ConfigFile> {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public String getData(String name) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.FILE_DATA, name);
+		String path = this.pathGenerator("/{name}/data", name);
 		return this._get(path, String.class);
 	}
 	
@@ -74,7 +64,7 @@ public class ConfigFileHandler extends DefaultRestHandler<ConfigFile> {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public void saveData(String name, String data) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.FILE_DATA, name);
+		String path = this.pathGenerator("/{name}/data", name);
 		this._put(path, data);
 	}
 	
@@ -85,7 +75,7 @@ public class ConfigFileHandler extends DefaultRestHandler<ConfigFile> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<ConfigFile> getConfigFilesByTemplate(String template) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.FILE_TEMPLATE, template);
+		String path = this.pathGenerator("/template/{template}", template);
 		return (Set<ConfigFile>) this._get(path, this.getSetType(ConfigFile.class));
 	}
 }

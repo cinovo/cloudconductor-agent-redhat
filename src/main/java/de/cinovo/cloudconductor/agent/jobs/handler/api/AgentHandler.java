@@ -22,7 +22,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.cinovo.cloudconductor.api.IRestPath;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
 import de.cinovo.cloudconductor.api.model.Authentication;
@@ -73,7 +72,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public PackageStateChanges notifyPackageState(String template, String host, PackageState state, String uuid) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_PACKAGE_STATE, template, host, uuid);
+		String path = this.pathGenerator("/agent/{template}/{host}/{uuid}/package", template, host, uuid);
 		return this._put(path, state, PackageStateChanges.class);
 	}
 	
@@ -86,7 +85,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public ServiceStatesChanges notifyServiceState(String template, String host, ServiceStates state, String uuid) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_SERVICE_STATE, template, host, uuid);
+		String path = this.pathGenerator("/agent/{template}/{host}/{uuid}/service", template, host, uuid);
 		return this._put(path, state, ServiceStatesChanges.class);
 	}
 	
@@ -96,7 +95,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public String getConfigFileData(String configFilename) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.FILE + IRestPath.FILE_DATA, configFilename);
+		String path = this.pathGenerator("/file/{name}/data", configFilename);
 		return this._get(path, String.class);
 	}
 	
@@ -107,7 +106,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public String getFileFileMode(String fileName) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.FILE + IRestPath.FILE_DETAILS, fileName);
+		String path = this.pathGenerator("/file/{name}", fileName);
 		ConfigFile file = this._get(path, ConfigFile.class);
 		return file.getFileMode();
 	}
@@ -118,7 +117,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public Template getTemplate(String template) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.DEFAULT_NAME, template);
+		String path = this.pathGenerator("/template/{name}", template);
 		
 		return this._get(path, Template.class);
 	}
@@ -131,7 +130,7 @@ public class AgentHandler extends AbstractApiHandler {
 	// TODO update path
 	@SuppressWarnings("unchecked")
 	public Set<Service> getServices(String template) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_SERVICE, template);
+		String path = this.pathGenerator("/template/{template}/services", template);
 		return (Set<Service>) this._get(path, this.getSetType(Service.class));
 	}
 	
@@ -142,21 +141,10 @@ public class AgentHandler extends AbstractApiHandler {
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<SSHKey> getSSHKeys(String template) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_SSHKEY, template);
+		String path = this.pathGenerator("/template/{template}/sshkeys", template);
 		AgentHandler.LOGGER.info("Get SSH keys from '" + path + "'...");
 		Object result = this._get(path, this.getSetType(SSHKey.class));
 		return (Set<SSHKey>) result;
-	}
-	
-	/**
-	 * @return collection of alive host names
-	 * @throws CloudConductorException Error indicating connection or data problems
-	 */
-	@SuppressWarnings("unchecked")
-	// TODO needed?
-	public Set<String> getAliveAgents() throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.AGENT);
-		return (Set<String>) this._get(path, this.getSetType(String.class));
 	}
 	
 	/**
@@ -168,18 +156,9 @@ public class AgentHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public AgentOption heartBeat(String template, String host, String agent, String uuid) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_HEART_BEAT, template, host, agent, uuid);
+		String path = this.pathGenerator("/agent/{template}/{host}/{agent}/{uuid}/heartbeat", template, host, agent, uuid);
 		AgentHandler.LOGGER.info("Send heartbeat to '" + path + "'");
 		return this._get(path, AgentOption.class);
-	}
-	
-	/**
-	 * @return collection of alive host names
-	 * @throws CloudConductorException Error indicating connection or data problems
-	 */
-	public Boolean isServerAlive() throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.AGENT + IRestPath.AGENT_PING);
-		return this._get(path, Boolean.class);
 	}
 	
 	/**
@@ -189,7 +168,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<Repo> getRepos(String templateName) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.TEMPLATE + IRestPath.TEMPLATE_REPO, templateName);
+		String path = this.pathGenerator("/template/{template}/repo", templateName);
 		return (Set<Repo>) this._get(path, this.getSetType(Repo.class));
 	}
 }

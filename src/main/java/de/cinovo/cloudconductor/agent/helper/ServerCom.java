@@ -60,8 +60,8 @@ public class ServerCom {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServerCom.class);
 	
 	private static final AgentHandler agent = new AgentHandler(AgentState.info().getServer());
-	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
-	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer(), AgentState.info().getToken(), AgentState.info().getAgent());
+	private static final ConfigValueHandler config = new ConfigValueHandler(AgentState.info().getServer());
+	private static final ConfigFileHandler file = new ConfigFileHandler(AgentState.info().getServer());
 	
 	
 	private ServerCom() {
@@ -265,15 +265,4 @@ public class ServerCom {
 		}
 	}
 	
-	/**
-	 * @return the response
-	 * @throws CloudConductorException thrown if communication with cloudconductor failed
-	 */
-	public static boolean isServerAlive() throws CloudConductorException {
-		try {
-			return ServerCom.agent.isServerAlive();
-		} catch (RuntimeException e) {
-			throw new CloudConductorException(e.getMessage());
-		}
-	}
 }

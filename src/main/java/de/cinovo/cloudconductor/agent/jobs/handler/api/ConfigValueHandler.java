@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JavaType;
 
-import de.cinovo.cloudconductor.api.IRestPath;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.ConfigValue;
 import de.cinovo.cloudconductor.api.model.KeyValue;
@@ -52,22 +51,13 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	}
 	
 	/**
-	 * @param cloudconductorUrl the config server url
-	 * @param token the token
-	 * @param agent the agent
-	 */
-	public ConfigValueHandler(String cloudconductorUrl, String token, String agent) {
-		super(cloudconductorUrl);
-	}
-	
-	/**
 	 * @param template the template name
 	 * @return map containing config kv-pairs of the template
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getConfig(String template) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE, template);
+		String path = this.pathGenerator("/config/{template}", template);
 		JavaType type = AbstractApiHandler.mapper.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
 		return (Map<String, String>) this._get(path, type);
 	}
@@ -80,7 +70,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ConfigValue> getConfig(String template, String service) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE_SERVICE, template, service);
+		String path = this.pathGenerator("/config/{template}/{service}", template, service);
 		ConfigValueHandler.LOGGER.info("Receive config from '" + path + "'...");
 		JavaType type = AbstractApiHandler.mapper.getTypeFactory().constructCollectionLikeType(ArrayList.class, ConfigValue.class);
 		List<ConfigValue> configList = (ArrayList<ConfigValue>) this._get(path, type);
@@ -95,7 +85,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public String getConfig(String template, String service, String key) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE_SERVICE_KEY, template, service, key);
+		String path = this.pathGenerator("/config/{template}/{service:.*}/{key}", template, service, key);
 		return this._get(path, String.class);
 	}
 	
@@ -106,7 +96,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public void addConfig(String template, String key, String value) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE, template);
+		String path = this.pathGenerator("/config/{template}", template);
 		KeyValue kv = new KeyValue(key, value);
 		this._put(path, kv);
 	}
@@ -119,7 +109,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public void addConfig(String template, String service, String key, String value) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE_SERVICE, template, service);
+		String path = this.pathGenerator("/config/{template}/{service}", template, service);
 		KeyValue kv = new KeyValue(key, value);
 		this._put(path, kv);
 	}
@@ -130,7 +120,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public void removeConfig(String template, String key) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE_KEY, template, key);
+		String path = this.pathGenerator("/config/{template}/{key}", template, key);
 		this._delete(path);
 	}
 	
@@ -141,7 +131,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	 * @throws CloudConductorException Error indicating connection or data problems
 	 */
 	public void removeConfig(String template, String service, String key) throws CloudConductorException {
-		String path = this.pathGenerator(IRestPath.CONFIG + IRestPath.CONFIG_TEMPLATE_SERVICE_KEY, template, service, key);
+		String path = this.pathGenerator("/config/{template}/{service:.*}/{key}", template, service, key);
 		this._delete(path);
 	}
 	
