@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>de.cinovo.cloudconductor</groupId>
 	<artifactId>cloudconductor-agent-redhat</artifactId>
-	<version>3.0-SNAPSHOT</version>
+	<version>3.0-RC-SNAPSHOT</version>
 	<name>Node Agent for cloudconductor framework</name>
 	<description>Node Agent for cloudconductor framework</description>
 	<url>https://github.com/cinovo/cloudconductor-agent-redhat</url>
@@ -52,26 +52,14 @@
 	</developers>
 	<contributors>
 		<contributor>
-			<name>Maximilian Hilbert</name>
-			<organization>Cinovo AG</organization>
-		</contributor>
-		<contributor>
-			<name>Fabian Toth</name>
-			<organization>Cinovo AG</organization>
-		</contributor>
-		<contributor>
 			<name>Marc Weise</name>
 			<organization>Cinovo AG</organization>
-		</contributor>
-		<contributor>
-			<name>Matthias Mayer</name>
-			<email>matthias_mayer@gmx.de</email>
 		</contributor>
 	</contributors>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.5</slf4j.version>
-		<cloudconductor.api.version>3.0-SNAPSHOT</cloudconductor.api.version>
+		<cloudconductor.api.version>3.0-RC-SNAPSHOT</cloudconductor.api.version>
 		<dvalin.version>1.22</dvalin.version>
 		<serviceName>cloudconductor-agent</serviceName>
 	</properties>
