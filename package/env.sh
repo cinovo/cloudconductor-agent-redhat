@@ -5,6 +5,8 @@ export CLOUDCONDUCTOR_URL="localhost:8090"
 #the name of the template to use by this agent
 export TEMPLATE_NAME="template"
 #the protocol the agent might use for REST calls. Options: http or https.
-export COM_PROTOCOL="http"
+export COM_PROTOCOL="https"
 # the uuid of this agent. Will be filled automatically.
 export UUID="uuid"
+#the agent authentication token
+export AUTH_TOKEN=""

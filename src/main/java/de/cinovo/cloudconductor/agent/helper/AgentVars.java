@@ -107,6 +107,6 @@ public interface AgentVars {
 	/**
 	 * default agent communication protocol
 	 */
-	String COMMUNICATION_PROTOCOL_DEFAULT = "http";
+	String COMMUNICATION_PROTOCOL_DEFAULT = "https";
 	
 }
