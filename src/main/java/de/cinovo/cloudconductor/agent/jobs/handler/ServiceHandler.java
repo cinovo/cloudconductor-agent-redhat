@@ -17,14 +17,6 @@ package de.cinovo.cloudconductor.agent.jobs.handler;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.ScriptExecutor;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
@@ -32,6 +24,13 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -102,7 +101,12 @@ public class ServiceHandler {
 		serviceStateHandler.execute();
 		try (Scanner s = new Scanner(serviceStateHandler.getResult())) {
 			while (s.hasNextLine()) {
-				runningServices.add(s.next().trim());
+				String scriptName = s.next().trim();
+				for(Service service : services) {
+					if(service.getInitScript().equalsIgnoreCase(scriptName)) {
+						runningServices.add(service.getName());
+					}
+				}
 			}
 		}
 		ServiceHandler.LOGGER.info(services.size() + " services registered, " + runningServices.size() + " running.");
