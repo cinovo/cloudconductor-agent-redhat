@@ -20,6 +20,15 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
+import de.cinovo.cloudconductor.api.model.Repo;
+import de.cinovo.cloudconductor.api.model.RepoMirror;
+import de.cinovo.cloudconductor.api.model.SSHKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,17 +43,6 @@ import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collection;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
-
-import de.cinovo.cloudconductor.api.model.Repo;
-import de.cinovo.cloudconductor.api.model.RepoMirror;
-import de.cinovo.cloudconductor.api.model.SSHKey;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -237,6 +235,8 @@ public class FileHelper {
 		StringBuilder keyStr = new StringBuilder();
 		for (SSHKey key : keys) {
 			keyStr.append(key.getKey());
+			keyStr.append(" ");
+			keyStr.append(username);
 			keyStr.append(System.lineSeparator());
 		}
 		
