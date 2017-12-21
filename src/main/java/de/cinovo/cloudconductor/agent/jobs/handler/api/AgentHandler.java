@@ -17,11 +17,6 @@ package de.cinovo.cloudconductor.agent.jobs.handler.api;
  * #L%
  */
 
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.AgentOption;
 import de.cinovo.cloudconductor.api.model.Authentication;
@@ -34,6 +29,10 @@ import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
 import de.cinovo.cloudconductor.api.model.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -142,7 +141,7 @@ public class AgentHandler extends AbstractApiHandler {
 	@SuppressWarnings("unchecked")
 	public Set<SSHKey> getSSHKeys(String template) throws CloudConductorException {
 		String path = this.pathGenerator("/template/{template}/sshkeys", template);
-		AgentHandler.LOGGER.info("Get SSH keys from '" + path + "'...");
+		AgentHandler.LOGGER.debug("Get SSH keys from '" + path + "'...");
 		Object result = this._get(path, this.getSetType(SSHKey.class));
 		return (Set<SSHKey>) result;
 	}
@@ -157,7 +156,7 @@ public class AgentHandler extends AbstractApiHandler {
 	 */
 	public AgentOption heartBeat(String template, String host, String agent, String uuid) throws CloudConductorException {
 		String path = this.pathGenerator("/agent/{template}/{host}/{agent}/{uuid}/heartbeat", template, host, agent, uuid);
-		AgentHandler.LOGGER.info("Send heartbeat to '" + path + "'");
+		AgentHandler.LOGGER.debug("Send heartbeat to '" + path + "'");
 		return this._get(path, AgentOption.class);
 	}
 	

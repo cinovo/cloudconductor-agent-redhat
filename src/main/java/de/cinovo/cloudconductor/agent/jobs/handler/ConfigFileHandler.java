@@ -1,10 +1,5 @@
 package de.cinovo.cloudconductor.agent.jobs.handler;
 
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.FileExecutor;
 import de.cinovo.cloudconductor.agent.executors.IExecutor;
@@ -12,6 +7,10 @@ import de.cinovo.cloudconductor.agent.executors.ScriptExecutor;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * Copyright 2014 Cinovo AG<br>
@@ -33,7 +32,7 @@ public class ConfigFileHandler {
 		Set<ConfigFile> configFiles;
 		try {
 			configFiles = ServerCom.getFiles();
-			ConfigFileHandler.LOGGER.info("Received " + configFiles.size() + " configuration files.");
+			ConfigFileHandler.LOGGER.debug("Received " + configFiles.size() + " configuration files.");
 		} catch (CloudConductorException e) {
 			ConfigFileHandler.LOGGER.error("Error getting configuration files from server: ", e);
 			throw new ExecutionError(e);

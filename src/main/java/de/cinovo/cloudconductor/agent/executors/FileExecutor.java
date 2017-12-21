@@ -20,24 +20,22 @@ package de.cinovo.cloudconductor.agent.executors;
  * #L%
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.hash.HashCode;
 import com.google.common.io.Files;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -105,7 +103,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 				
 				if (!serverFileHash.equals(localFileHash)) {
 					try {
-						FileExecutor.LOGGER.info("Update config file '" + configFile.getName() + "'...");
+						FileExecutor.LOGGER.debug("Update config file '" + configFile.getName() + "'...");
 						Files.createParentDirs(localFile);
 						Files.write(serverFile, localFile, Charset.forName("UTF-8"));
 						changeOccured = true;
@@ -149,7 +147,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			if (configFile.isReloadable() && changeOccured) {
 				Set<String> servicesToRestart = configFile.getDependentServices();
 				this.restart.addAll(servicesToRestart);
-				FileExecutor.LOGGER.info("Config file changed, " + servicesToRestart.size() + " services have to be restarted!");
+				FileExecutor.LOGGER.debug("Config file changed, " + servicesToRestart.size() + " services have to be restarted!");
 			}
 		}
 		

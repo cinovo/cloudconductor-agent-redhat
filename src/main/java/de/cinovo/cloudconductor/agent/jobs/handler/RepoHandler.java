@@ -1,16 +1,15 @@
 package de.cinovo.cloudconductor.agent.jobs.handler;
 
-import java.io.IOException;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.Repo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * 
@@ -37,7 +36,7 @@ public class RepoHandler {
 			throw new ExecutionError("Error getting repositories for template: ", e);
 		}
 		
-		RepoHandler.LOGGER.info("Update " + repos.size() + " yum repos...");
+		RepoHandler.LOGGER.debug("Update " + repos.size() + " yum repos...");
 		
 		for (Repo repo : repos) {
 			try {

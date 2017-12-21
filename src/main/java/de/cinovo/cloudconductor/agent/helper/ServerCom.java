@@ -17,19 +17,6 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
 import de.cinovo.cloudconductor.agent.jobs.handler.api.AgentHandler;
@@ -47,6 +34,18 @@ import de.cinovo.cloudconductor.api.model.Service;
 import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
 import de.cinovo.cloudconductor.api.model.Template;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -98,7 +97,7 @@ public class ServerCom {
 		try {
 			for (ConfigValue c : ServerCom.config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME)) {
 				if ((c.getService() != null) && c.getService().equals(AgentVars.SERVICE_NAME)) {
-					ServerCom.LOGGER.info("Add config: " + c.getKey() + ": " + c.getValue());
+					ServerCom.LOGGER.debug("Add config: " + c.getKey() + ": " + c.getValue());
 					configMap.put(c.getKey(), (String) c.getValue());
 				}
 			}

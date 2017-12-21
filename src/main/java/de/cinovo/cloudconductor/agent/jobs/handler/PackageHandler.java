@@ -17,14 +17,6 @@ package de.cinovo.cloudconductor.agent.jobs.handler;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.IExecutor;
 import de.cinovo.cloudconductor.agent.executors.InstalledPackages;
@@ -34,6 +26,13 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.PackageState;
 import de.cinovo.cloudconductor.api.model.PackageStateChanges;
 import de.cinovo.cloudconductor.api.model.PackageVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -51,14 +50,14 @@ public class PackageHandler {
 	 * @throws ExecutionError an error occurred during execution
 	 */
 	public void run() throws ExecutionError {
-		PackageHandler.LOGGER.info("Start PackageHandler");
+		PackageHandler.LOGGER.debug("Start PackageHandler");
 		
 		// report installed packages
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
-		PackageHandler.LOGGER.info("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
+		PackageHandler.LOGGER.debug("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
 		
 		Map<String, PackageStateChanges> changesByRepo = this.getChangesByRepo(packageChanges);
-		PackageHandler.LOGGER.info("Package changes for " + changesByRepo.size() + " repos");
+		PackageHandler.LOGGER.debug("Package changes for " + changesByRepo.size() + " repos");
 		
 		// executed package changes for each repository
 		for (Map.Entry<String, PackageStateChanges> changes : changesByRepo.entrySet()) {
@@ -132,7 +131,7 @@ public class PackageHandler {
 		
 		// handle package versions to be deleted
 		for (PackageVersion pvToDelete : allChanges.getToErase()) {
-			PackageHandler.LOGGER.info("Package Version: " + pvToDelete.toString());
+			PackageHandler.LOGGER.debug("Package Version: " + pvToDelete.toString());
 			String repoToUse = null;
 			for (String repo : pvToDelete.getRepos()) {
 				repoToUse = repo;

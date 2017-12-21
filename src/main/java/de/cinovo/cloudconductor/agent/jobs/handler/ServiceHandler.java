@@ -63,7 +63,7 @@ public class ServiceHandler {
 		int nStart = serviceChanges.getToStart().size();
 		int nStop = serviceChanges.getToStop().size();
 		int nRestart = serviceChanges.getToRestart().size();
-		ServiceHandler.LOGGER.info("Service changes: " + nStart + " to be started, " + nStop + " to be stopped, " + nRestart + " to be restarted");
+		ServiceHandler.LOGGER.debug("Service changes: " + nStart + " to be started, " + nStop + " to be stopped, " + nRestart + " to be restarted");
 		
 		// handle service changes
 		ServiceHandler.LOGGER.debug("ServiceHandler: Handle service changes");
@@ -109,7 +109,7 @@ public class ServiceHandler {
 				}
 			}
 		}
-		ServiceHandler.LOGGER.info(services.size() + " services registered, " + runningServices.size() + " running.");
+		ServiceHandler.LOGGER.debug(services.size() + " services registered, " + runningServices.size() + " running.");
 		
 		return runningServices;
 	}

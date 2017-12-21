@@ -1,19 +1,17 @@
 package de.cinovo.cloudconductor.agent.jobs;
 
-import java.text.ParseException;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.helper.JWTHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -47,7 +45,7 @@ public class RefreshJWTJob implements AgentJob {
 				AgentState.info().setJWT(newJWT);
 				
 				period = JWTHelper.calcNextRefreshInMillis(claimsSet);
-				RefreshJWTJob.LOGGER.info("Authentication successful!");
+				RefreshJWTJob.LOGGER.debug("Authentication successful!");
 			} else {
 				RefreshJWTJob.LOGGER.error("Authentication failed: Missing JWT!");
 				throw new CloudConductorException("Missing JWT!");
@@ -58,8 +56,7 @@ public class RefreshJWTJob implements AgentJob {
 			RefreshJWTJob.LOGGER.error("Error parsing new JWT '" + newJWT + "': ", e);
 		} finally {
 			SchedulerService.instance.executeOnce(new RefreshJWTJob(), period, TimeUnit.MILLISECONDS);
-			RefreshJWTJob.LOGGER.info("Scheduled next refresh of JWT in " + period + " ms");
-			
+			RefreshJWTJob.LOGGER.debug("Scheduled next refresh of JWT in " + period + " ms");
 			RefreshJWTJob.LOGGER.debug("Finished RefreshJWTJob");
 		}
 	}

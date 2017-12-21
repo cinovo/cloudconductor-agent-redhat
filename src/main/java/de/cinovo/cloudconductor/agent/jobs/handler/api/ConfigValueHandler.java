@@ -17,19 +17,17 @@ package de.cinovo.cloudconductor.agent.jobs.handler.api;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.JavaType;
+import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import de.cinovo.cloudconductor.api.model.ConfigValue;
+import de.cinovo.cloudconductor.api.model.KeyValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JavaType;
-
-import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
-import de.cinovo.cloudconductor.api.model.ConfigValue;
-import de.cinovo.cloudconductor.api.model.KeyValue;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -71,7 +69,7 @@ public class ConfigValueHandler extends AbstractApiHandler {
 	@SuppressWarnings("unchecked")
 	public List<ConfigValue> getConfig(String template, String service) throws CloudConductorException {
 		String path = this.pathGenerator("/config/{template}/{service}", template, service);
-		ConfigValueHandler.LOGGER.info("Receive config from '" + path + "'...");
+		ConfigValueHandler.LOGGER.debug("Receive config from '" + path + "'...");
 		JavaType type = AbstractApiHandler.mapper.getTypeFactory().constructCollectionLikeType(ArrayList.class, ConfigValue.class);
 		List<ConfigValue> configList = (ArrayList<ConfigValue>) this._get(path, type);
 		return configList;

@@ -47,24 +47,24 @@ public class OptionHandler {
 		// option timer
 		if ((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || //
 		(this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
-			OptionHandler.LOGGER.info("Reseting OPTIONTIMER TO " + this.newOptions.getAliveTimer() + ":" + this.newOptions.getAliveTimerUnit());
+			OptionHandler.LOGGER.debug("Reseting OPTIONTIMER TO " + this.newOptions.getAliveTimer() + ":" + this.newOptions.getAliveTimerUnit());
 			SchedulerService.instance.resetTask(HeartBeatJob.JOB_NAME, this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
 		}
 		
 		// SSH KEYS
 		switch (this.newOptions.getDoSshKeys()) {
 		case OFF:
-			OptionHandler.LOGGER.info("OptionHandler: STOP SHH KEY");
+			OptionHandler.LOGGER.debug("OptionHandler: STOP SHH KEY");
 			SchedulerService.instance.stop(AuthorizedKeysJob.JOB_NAME);
 			break;
 		case ONCE:
-			OptionHandler.LOGGER.info("OptionHandler: ONCE SHH KEY");
+			OptionHandler.LOGGER.debug("OptionHandler: ONCE SHH KEY");
 			SchedulerService.instance.stop(AuthorizedKeysJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(AuthorizedKeysJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getSshKeysTimer() != oldOptions.getSshKeysTimer()) || (this.newOptions.getSshKeysTimerUnit() != oldOptions.getSshKeysTimerUnit())) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEAT SHH KEY");
+				OptionHandler.LOGGER.debug("OptionHandler: REPEAT SHH KEY");
 				SchedulerService.instance.resetTask(AuthorizedKeysJob.JOB_NAME, this.newOptions.getSshKeysTimer(), this.newOptions.getSshKeysTimerUnit());
 			}
 			break;
@@ -73,17 +73,17 @@ public class OptionHandler {
 		// FILE MANAGEMENT
 		switch (this.newOptions.getDoFileManagement()) {
 		case OFF:
-			OptionHandler.LOGGER.info("OptionHandler: STOP FILE MANAGEMENT");
+			OptionHandler.LOGGER.debug("OptionHandler: STOP FILE MANAGEMENT");
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
 			break;
 		case ONCE:
-			OptionHandler.LOGGER.info("OptionHandler: ONCE FILE MANAGEMENT");
+			OptionHandler.LOGGER.debug("OptionHandler: ONCE FILE MANAGEMENT");
 			SchedulerService.instance.stop(FilesJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(FilesJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getFileManagementTimer() != oldOptions.getFileManagementTimer()) || (this.newOptions.getFileManagementTimerUnit() != oldOptions.getFileManagementTimerUnit())) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEAT FILE MANAGEMENT");
+				OptionHandler.LOGGER.debug("OptionHandler: REPEAT FILE MANAGEMENT");
 				SchedulerService.instance.resetTask(FilesJob.JOB_NAME, this.newOptions.getFileManagementTimer(), this.newOptions.getFileManagementTimerUnit());
 			}
 			break;
@@ -92,17 +92,17 @@ public class OptionHandler {
 		// PACKAGE MANAGEMENT
 		switch (this.newOptions.getDoPackageManagement()) {
 		case OFF:
-			OptionHandler.LOGGER.info("OptionHandler: STOP PKG MANAGEMENT");
+			OptionHandler.LOGGER.debug("OptionHandler: STOP PKG MANAGEMENT");
 			SchedulerService.instance.stop(DefaultJob.JOB_NAME);
 			break;
 		case ONCE:
-			OptionHandler.LOGGER.info("OptionHandler: ONCE PKG MANAGEMENT");
+			OptionHandler.LOGGER.debug("OptionHandler: ONCE PKG MANAGEMENT");
 			SchedulerService.instance.stop(DefaultJob.JOB_NAME);
 			SchedulerService.instance.executeOnce(DefaultJob.JOB_NAME);
 			break;
 		case REPEAT:
 			if ((oldOptions == null) || (this.newOptions.getPackageManagementTimer() != oldOptions.getPackageManagementTimer()) || (this.newOptions.getPackageManagementTimerUnit().equals(oldOptions.getPackageManagementTimerUnit()))) {
-				OptionHandler.LOGGER.info("OptionHandler: REPEAT PKG MANAGEMENT");
+				OptionHandler.LOGGER.debug("OptionHandler: REPEAT PKG MANAGEMENT");
 				SchedulerService.instance.resetTask(DefaultJob.JOB_NAME, this.newOptions.getPackageManagementTimer(), this.newOptions.getPackageManagementTimerUnit());
 			}
 			break;
