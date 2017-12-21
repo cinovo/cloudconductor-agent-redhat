@@ -103,7 +103,7 @@ public class ServiceHandler {
 			while (s.hasNextLine()) {
 				String scriptName = s.next().trim();
 				for(Service service : services) {
-					if(service.getInitScript().equalsIgnoreCase(scriptName)) {
+					if(service.getInitScript().equalsIgnoreCase(scriptName) && !runningServices.contains(service.getName())) {
 						runningServices.add(service.getName());
 					}
 				}
