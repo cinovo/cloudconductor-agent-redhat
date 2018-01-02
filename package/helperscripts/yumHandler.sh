@@ -68,7 +68,7 @@ do
 done
 
 if [ ! -z "$delete_str" ]; then
-	yum -y --enablerepo=$REPO remove $delete_str &>log/yumError.log
+	yum -y remove $delete_str &>log/yumError.log
 	grepecho "DELETE"
 fi
 
