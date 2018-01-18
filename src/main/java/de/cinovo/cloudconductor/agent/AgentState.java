@@ -222,7 +222,7 @@ public class AgentState {
 			Path path = Paths.get("/opt/cloudconductor-agent/cloudconductor-agent.properties");
 
 			String content = new String(Files.readAllBytes(path), charset);
-			content = content.replaceAll("TEMPLATE_NAME=\".*\"", "TEMPLATE_NAME=\"" + templateName + "\"");
+			content = content.replaceAll("TEMPLATE_NAME=\".*\"", "TEMPLATE_NAME=" + templateName);
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
 			this.logger.error("Failed to write template name to cloudconductor-agent.properties", ex.getMessage());
@@ -248,9 +248,9 @@ public class AgentState {
 
 			String content = new String(Files.readAllBytes(path), charset);
 			if(content.contains(AgentVars.UUID_PROP)) {
-				content = content.replaceAll(AgentVars.UUID_PROP + "=\".*\"", AgentVars.UUID_PROP + "=\"" + uuid + "\"");
+				content = content.replaceAll(AgentVars.UUID_PROP + "=\".*\"", AgentVars.UUID_PROP + "=" + uuid);
 			} else {
-				content = content + "export " + AgentVars.UUID_PROP + "=\"" + uuid + "\"\n";
+				content = content + "export " + AgentVars.UUID_PROP + "=" + uuid + "\n";
 			}
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
