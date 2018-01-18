@@ -59,17 +59,26 @@ public class InstalledPackages extends AbstractExecutor<List<PackageVersion>> {
 			throw new ExecutionError("Error while collecting installed packages");
 		}
 		this.logger.debug("Found installed packages: " + dev.length);
+		String oldString = null;
 		for(String str : dev) {
+			if(oldString != null && str.startsWith(" ")) {
+				//we need this to work around the yum list bullshit of breaking to new lines sometimes
+				str = oldString + str;
+			}
 			str = str.replaceAll("\\s+", delimiter);
-
 			String[] arr = str.split(InstalledPackages.delimiter);
-			if(arr.length < 2) {
+			if(arr.length < 3) {
+				oldString = str;
 				continue;
 			}
+			oldString = null;
 			String pkg = arr[0].split("\\.")[0];
 			String version = arr[1].split(":")[arr[1].split(":").length - 1];
-
-			String repo = arr.length < 3 ? "" : arr[2].replace("@", "");
+			if(!version.matches(".*\\d.*")) {
+				// we don't have a version -> useless information
+				continue;
+			}
+			String repo = arr[2].replace("@", "");
 			PackageVersion packageVersion = new PackageVersion(pkg, version, null);
 			Set<String> repos = new HashSet<>();
 			repos.add(repo);
