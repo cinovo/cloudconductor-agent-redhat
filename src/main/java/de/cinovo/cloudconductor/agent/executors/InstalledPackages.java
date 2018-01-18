@@ -52,15 +52,24 @@ public class InstalledPackages extends AbstractExecutor<List<PackageVersion>> {
 	@Override
 	protected void analyzeStream(String[] dev, String[] error) throws ExecutionError {
 		if(error.length > 0) {
+			this.logger.error("Failed to get installed packages");
+			for(String s : error) {
+				this.logger.error(s);
+			}
 			throw new ExecutionError("Error while collecting installed packages");
 		}
-		this.logger.debug("Found installed packages: ");
+		this.logger.debug("Found installed packages: " + dev.length);
 		for(String str : dev) {
 			str = str.replaceAll("\\s+", delimiter);
+
 			String[] arr = str.split(InstalledPackages.delimiter);
+			if(arr.length < 2) {
+				continue;
+			}
 			String pkg = arr[0].split("\\.")[0];
 			String version = arr[1].split(":")[arr[1].split(":").length - 1];
-			String repo = arr[2].replace("@", "");
+
+			String repo = arr.length < 3 ? "" : arr[2].replace("@", "");
 			PackageVersion packageVersion = new PackageVersion(pkg, version, null);
 			Set<String> repos = new HashSet<>();
 			repos.add(repo);

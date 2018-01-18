@@ -9,7 +9,6 @@ progname=cloudconductor-agent
 pidfile=/var/run/$progname
 rundir=/opt/cloudconductor-agent
 jarfile=de.cinovo.cloudconductor.cloudconductor-agent-redhat.jar
-envFile=$rundir/env.sh
 runuser=root;
 gracetime=10;
 maxmem=12m;
@@ -25,10 +24,6 @@ do_start() {
         	echo "$progname already running with PID $pid"
             exit 1;
     	fi
-    fi
-	
-	if [ -f $envFile ]; then
-    	. $envFile
     fi
 
 	# encoding will be broken otherwise (ticket #1718)

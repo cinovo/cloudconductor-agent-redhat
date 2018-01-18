@@ -20,11 +20,11 @@ package de.cinovo.cloudconductor.agent.executors.helper;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.IExecutor;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -55,7 +55,7 @@ public abstract class AbstractExecutor<T> implements IExecutor<T> {
 	 */
 	@Override
 	public IExecutor<T> execute() throws ExecutionError {
-		Process p = null;
+		Process p;
 		try {
 			p = this.genProcess();
 		} catch (Exception e) {

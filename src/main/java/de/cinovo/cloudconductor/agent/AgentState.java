@@ -219,13 +219,13 @@ public class AgentState {
 		}
 		System.setProperty(AgentVars.TEMPLATE_PROP, templateName);
 		try {
-			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
+			Path path = Paths.get("/opt/cloudconductor-agent/cloudconductor-agent.properties");
 
 			String content = new String(Files.readAllBytes(path), charset);
-			content = content.replaceAll("export TEMPLATE_NAME=\".*\"", "export TEMPLATE_NAME=\"" + templateName + "\"");
+			content = content.replaceAll("TEMPLATE_NAME=\".*\"", "TEMPLATE_NAME=\"" + templateName + "\"");
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
-			this.logger.error("Failed to write template name to env.sh", ex.getMessage());
+			this.logger.error("Failed to write template name to cloudconductor-agent.properties", ex.getMessage());
 		}
 
 	}
@@ -244,17 +244,17 @@ public class AgentState {
 		}
 		System.setProperty(AgentVars.UUID_PROP, uuid);
 		try {
-			Path path = Paths.get("/opt/cloudconductor-agent/env.sh");
+			Path path = Paths.get("/opt/cloudconductor-agent/cloudconductor-agent.properties");
 
 			String content = new String(Files.readAllBytes(path), charset);
 			if(content.contains(AgentVars.UUID_PROP)) {
-				content = content.replaceAll("export " + AgentVars.UUID_PROP + "=\".*\"", "export " + AgentVars.UUID_PROP + "=\"" + uuid + "\"");
+				content = content.replaceAll(AgentVars.UUID_PROP + "=\".*\"", AgentVars.UUID_PROP + "=\"" + uuid + "\"");
 			} else {
 				content = content + "export " + AgentVars.UUID_PROP + "=\"" + uuid + "\"\n";
 			}
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
-			this.logger.error("Failed to write uuid to env.sh", ex.getMessage());
+			this.logger.error("Failed to write uuid to cloudconductor-agent.properties", ex.getMessage());
 		}
 	}
 

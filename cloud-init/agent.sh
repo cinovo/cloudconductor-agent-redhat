@@ -8,7 +8,7 @@
 
 rpm -ivh http://yum.cloudconductor.net/cloudconductor-agent-2.7-1.noarch.rpm
 
-cat > /opt/cloudconductor-agent/env.sh <<EOF
+cat > /opt/cloudconductor-agent/cloudconductor-agent.properties <<EOF
 export CLOUDCONDUCTOR_URL=$CLOUDCONDUCTOR_URL
 export TEMPLATE_NAME=$TEMPLATE_NAME
 EOF

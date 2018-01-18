@@ -17,26 +17,24 @@ package de.cinovo.cloudconductor.agent.jobs.handler.api;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.http.HttpResponse;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
 import de.cinovo.cloudconductor.agent.AgentState;
+import de.cinovo.cloudconductor.agent.helper.MapperFactory;
 import de.cinovo.cloudconductor.api.MediaType;
 import de.cinovo.cloudconductor.api.lib.exceptions.ClientErrorException;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.lib.exceptions.SerializationException;
 import de.cinovo.cloudconductor.api.lib.exceptions.ServerErrorException;
-import de.taimos.dvalin.jaxrs.MapperFactory;
 import de.taimos.httputils.HTTPRequest;
 import de.taimos.httputils.WS;
+import org.apache.http.HttpResponse;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>

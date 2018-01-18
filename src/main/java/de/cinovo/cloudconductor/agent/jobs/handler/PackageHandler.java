@@ -30,10 +30,7 @@ import de.cinovo.cloudconductor.api.model.PackageVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -56,26 +53,23 @@ public class PackageHandler {
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
 		PackageHandler.LOGGER.debug("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
 
-		Map<String, PackageStateChanges> changesByRepo = this.getChangesByRepo(packageChanges);
-		PackageHandler.LOGGER.debug("Package changes for " + changesByRepo.size() + " repos");
+		StringBuilder repoName = new StringBuilder();
+		AgentState.info().getRepos().forEach(r -> repoName.append(r + ","));
+		PackageHandler.LOGGER.debug("Execute changes on repo '" + repoName + "'");
 
 		// executed package changes for each repository
-		for(Map.Entry<String, PackageStateChanges> changes : changesByRepo.entrySet()) {
-			String repoName = changes.getKey();
-			PackageHandler.LOGGER.info("Execute changes on repo '" + repoName + "'");
 
-			List<PackageVersion> toDelete = changes.getValue().getToErase();
-			PackageHandler.LOGGER.info("Delete : " + toDelete.toString());
+		List<PackageVersion> toDelete = packageChanges.getToErase();
+		PackageHandler.LOGGER.debug("Delete : " + toDelete.toString());
 
-			List<PackageVersion> toInstall = changes.getValue().getToInstall();
-			PackageHandler.LOGGER.info("Install: " + toInstall.toString());
+		List<PackageVersion> toInstall = packageChanges.getToInstall();
+		PackageHandler.LOGGER.debug("Install: " + toInstall.toString());
 
-			List<PackageVersion> toUpdate = changes.getValue().getToUpdate();
-			PackageHandler.LOGGER.info("Update: " + toUpdate.toString());
+		List<PackageVersion> toUpdate = packageChanges.getToUpdate();
+		PackageHandler.LOGGER.debug("Update: " + toUpdate.toString());
 
-			ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName, toDelete, toInstall, toUpdate);
-			pkgHandler.execute();
-		}
+		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName.toString(), toDelete, toInstall, toUpdate);
+		pkgHandler.execute();
 
 		// re-report installed packages
 		this.reportInstalledPackages();
@@ -83,74 +77,12 @@ public class PackageHandler {
 		PackageHandler.LOGGER.debug("Finished PackageHandler");
 	}
 
-	private Map<String, PackageStateChanges> getChangesByRepo(PackageStateChanges allChanges) {
-		HashMap<String, PackageStateChanges> changesByRepo = new HashMap<>();
-
-		for(PackageVersion pvToInstall : allChanges.getToInstall()) {
-
-			// first find out which repo should actually be used
-			String repoToUse = this.findRepo(pvToInstall);
-			if(repoToUse == null) {
-				continue;
-			}
-
-			// add package version for selected repo
-			if(!changesByRepo.containsKey(repoToUse)) {
-				changesByRepo.put(repoToUse, new PackageStateChanges(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-			}
-			changesByRepo.get(repoToUse).getToInstall().add(pvToInstall);
-		}
-
-		// handle package versions to be updated
-		for(PackageVersion pvToUpdate : allChanges.getToUpdate()) {
-			String repoToUse = this.findRepo(pvToUpdate);
-			if(repoToUse == null) {
-				continue;
-			}
-
-			// add package version for selected repo
-			if(!changesByRepo.containsKey(repoToUse)) {
-				changesByRepo.put(repoToUse, new PackageStateChanges(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-			}
-			changesByRepo.get(repoToUse).getToUpdate().add(pvToUpdate);
-		}
-
-		// handle package versions to be deleted
-		for(PackageVersion pvToDelete : allChanges.getToErase()) {
-			PackageHandler.LOGGER.debug("Package Version: " + pvToDelete.toString());
-			String repoToUse = this.findRepo(pvToDelete);
-			//we don't skip repo == null on delete, since the delete script is not repo dependant, and we assure the deinstall this way
-
-			// add package version for selected repo
-			if(!changesByRepo.containsKey(repoToUse)) {
-				changesByRepo.put(repoToUse, new PackageStateChanges(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-			}
-			changesByRepo.get(repoToUse).getToErase().add(pvToDelete);
-		}
-
-		return changesByRepo;
-	}
-
-	private String findRepo(PackageVersion version) {
-		for(String agentRepo : AgentState.info().getRepos()) {
-			if(version.getRepos().contains(agentRepo)) {
-				return agentRepo;
-			}
-		}
-		LOGGER.info("Can't handle Package " + version.toString() + " - No repository provides this package");
-		return null;
-	}
-
 	private PackageStateChanges reportInstalledPackages() throws ExecutionError {
-		PackageState installedPackages = null;
+		PackageState installedPackages;
+		LOGGER.debug("Sarting to report packages");
 		IExecutor<List<PackageVersion>> execute = new InstalledPackages().execute();
+		LOGGER.debug("Found packages to report");
 		installedPackages = new PackageState(execute.getResult());
-
-		StringBuilder sb = new StringBuilder();
-		for(PackageVersion pv : installedPackages.getInstalledRpms()) {
-			sb.append(pv.getName() + ":" + pv.getVersion() + ", ");
-		}
-
 		try {
 			return ServerCom.notifyInstalledPackages(installedPackages);
 		} catch(CloudConductorException e) {

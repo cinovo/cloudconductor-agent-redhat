@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,6 +32,7 @@ public class SchedulerService {
 	
 	private SchedulerService() {
 		this.ses = Executors.newScheduledThreadPool(10);
+		((ScheduledThreadPoolExecutor) this.ses).setRemoveOnCancelPolicy(true);
 		this.runningTasks = new HashMap<>();
 		this.tasks = new HashMap<>();
 	}
@@ -77,7 +79,18 @@ public class SchedulerService {
 	public ScheduledFuture<?> executeOnce(String identifier) {
 		return this.ses.schedule(this.tasks.get(identifier), 0, TimeUnit.SECONDS);
 	}
-	
+
+	/**
+	 * @param identifier the identifier
+	 * @return whether the task is running or not
+	 */
+	public boolean taskRunning(String identifier) {
+		if (this.runningTasks.containsKey(identifier)) {
+			return this.runningTasks.get(identifier) != null;
+		}
+		return false;
+	}
+
 	/**
 	 * @param identifier the identifier
 	 * @param period the new period

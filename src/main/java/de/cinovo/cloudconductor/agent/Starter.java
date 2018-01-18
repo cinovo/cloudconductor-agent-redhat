@@ -17,12 +17,11 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
+import de.cinovo.cloudconductor.agent.helper.AgentVars;
+import de.taimos.daemon.DaemonStarter;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.Log4JLogChute;
-
-import de.cinovo.cloudconductor.agent.helper.AgentVars;
-import de.taimos.daemon.DaemonStarter;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -37,34 +36,8 @@ public final class Starter {
 	 * @param args arguments
 	 */
 	public static void main(final String[] args) {
-		Starter.assure(AgentVars.CLOUDCONDUCTOR_URL_PROP, "The CloudConductor url is not set.");
-		Starter.assure(AgentVars.TEMPLATE_PROP, "No template was set.");
-		Starter.applyPropertyFromEnv(AgentVars.AGENT_PROP);
-		Starter.applyPropertyFromEnv(AgentVars.TOKEN_PROP);
-		Starter.applyPropertyFromEnv(AgentVars.UUID_PROP);
-		Starter.applyPropertyFromEnv(AgentVars.COMMUNICATION_PROTOCOL);
 		Starter.initVelocity();
-		
 		DaemonStarter.startDaemon(AgentVars.SERVICE_NAME, new NodeAgent());
-	}
-	
-	private static void assure(String prop, String errorMsg) {
-		if ((System.getProperty(prop) == null) || System.getProperty(prop).isEmpty()) {
-			if ((System.getenv(prop) == null) || System.getenv(prop).isEmpty()) {
-				System.err.println(errorMsg);
-				System.exit(1);
-			} else {
-				System.setProperty(prop, System.getenv(prop));
-			}
-		}
-	}
-	
-	private static void applyPropertyFromEnv(String prop) {
-		if ((System.getProperty(prop) == null) || System.getProperty(prop).isEmpty()) {
-			if ((System.getenv(prop) != null) && !(System.getenv(prop).isEmpty())) {
-				System.setProperty(prop, System.getenv(prop));
-			}
-		}
 	}
 	
 	private static void initVelocity() {
@@ -80,9 +53,5 @@ public final class Starter {
 			System.err.println("Couldn't start up velocity.");
 			System.exit(1);
 		}
-	}
-	
-	private Starter() {
-		// prevent instantiation
 	}
 }
