@@ -20,19 +20,17 @@ package de.cinovo.cloudconductor.agent.jobs;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ArrayListMultimap;
-
 import de.cinovo.cloudconductor.agent.helper.FileHelper;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.SSHKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -62,7 +60,7 @@ public class AuthorizedKeysJob implements AgentJob {
 		if (!sshKeys.isEmpty()) {
 			ArrayListMultimap<String, SSHKey> userKeyMap = ArrayListMultimap.create();
 			for (SSHKey key : sshKeys) {
-				userKeyMap.put(key.getUsername(), key);
+				userKeyMap.put(key.getOwner(), key);
 			}
 			
 			// write file for each user
