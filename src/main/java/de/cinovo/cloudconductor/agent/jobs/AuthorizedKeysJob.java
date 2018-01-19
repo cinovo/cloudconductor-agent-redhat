@@ -60,7 +60,7 @@ public class AuthorizedKeysJob implements AgentJob {
 		if (!sshKeys.isEmpty()) {
 			ArrayListMultimap<String, SSHKey> userKeyMap = ArrayListMultimap.create();
 			for (SSHKey key : sshKeys) {
-				userKeyMap.put(key.getOwner(), key);
+				userKeyMap.put(key.getUsername(), key);
 			}
 			
 			// write file for each user
