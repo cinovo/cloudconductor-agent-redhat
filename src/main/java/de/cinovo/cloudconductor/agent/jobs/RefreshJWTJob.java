@@ -52,8 +52,10 @@ public class RefreshJWTJob implements AgentJob {
 			}
 		} catch (CloudConductorException e) {
 			RefreshJWTJob.LOGGER.error("Error refreshing JWT: ", e);
+			AgentState.info().setJWT(null);
 		} catch (ParseException e) {
 			RefreshJWTJob.LOGGER.error("Error parsing new JWT '" + newJWT + "': ", e);
+			AgentState.info().setJWT(null);
 		} finally {
 			SchedulerService.instance.executeOnce(new RefreshJWTJob(), period, TimeUnit.MILLISECONDS);
 			RefreshJWTJob.LOGGER.debug("Scheduled next refresh of JWT in " + period + " ms");
