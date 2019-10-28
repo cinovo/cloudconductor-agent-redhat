@@ -88,7 +88,7 @@ do
         update_str="$update_str $element"
 done
 if [ ! -z "$update_str" ]; then
-	yum -y --enablerepo=$REPO update $update_str &>log/yumError.log
+	yum -y --enablerepo=$REPO update-to $update_str &>log/yumError.log
 	grepecho "UPDATE"
 fi
 
