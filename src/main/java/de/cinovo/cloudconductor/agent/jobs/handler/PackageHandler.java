@@ -42,7 +42,6 @@ public class PackageHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PackageHandler.class);
 
-
 	/**
 	 * @throws ExecutionError an error occurred during execution
 	 */
@@ -51,24 +50,17 @@ public class PackageHandler {
 
 		// report installed packages
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
-		PackageHandler.LOGGER.debug("Received : " + packageChanges.getToErase().size() + " to delete, " + packageChanges.getToInstall().size() + " to install, " + packageChanges.getToUpdate().size() + " to update");
-
-		StringBuilder repoName = new StringBuilder();
-		AgentState.info().getRepos().forEach(r -> repoName.append(r + ","));
-		PackageHandler.LOGGER.debug("Execute changes on repo '" + repoName + "'");
+		String repoNames  = String.join(",", AgentState.info().getRepos());
+		PackageHandler.LOGGER.debug("Execute changes on repos {}", repoNames);
 
 		// executed package changes for each repository
-
 		List<PackageVersion> toDelete = packageChanges.getToErase();
-		PackageHandler.LOGGER.debug("Delete : " + toDelete.toString());
-
+		PackageHandler.LOGGER.debug("Delete: {}", toDelete.toString());
 		List<PackageVersion> toInstall = packageChanges.getToInstall();
-		PackageHandler.LOGGER.debug("Install: " + toInstall.toString());
-
+		PackageHandler.LOGGER.debug("Install: {}", toInstall.toString());
 		List<PackageVersion> toUpdate = packageChanges.getToUpdate();
-		PackageHandler.LOGGER.debug("Update: " + toUpdate.toString());
-
-		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoName.toString(), toDelete, toInstall, toUpdate);
+		PackageHandler.LOGGER.debug("Update: {}", toUpdate.toString());
+		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoNames, toDelete, toInstall, toUpdate);
 		pkgHandler.execute();
 
 		// re-report installed packages
@@ -79,9 +71,9 @@ public class PackageHandler {
 
 	private PackageStateChanges reportInstalledPackages() throws ExecutionError {
 		PackageState installedPackages;
-		LOGGER.debug("Sarting to report packages");
+		PackageHandler.LOGGER.debug("Starting to report packages");
 		IExecutor<List<PackageVersion>> execute = new InstalledPackages().execute();
-		LOGGER.debug("Found packages to report");
+		PackageHandler.LOGGER.debug("Found packages to report");
 		installedPackages = new PackageState(execute.getResult());
 		try {
 			return ServerCom.notifyInstalledPackages(installedPackages);
