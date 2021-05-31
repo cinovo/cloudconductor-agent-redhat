@@ -1,8 +1,6 @@
 package de.cinovo.cloudconductor.agent.jobs.handler.api;
 
-import org.apache.http.HttpResponse;
-
-import de.taimos.httputils.WS;
+import de.taimos.httputils.HTTPResponse;
 
 /*
  * #%L
@@ -43,11 +41,11 @@ public enum HttpStatusClass {
 	/** server error status, 5xx codes */
 	SERVER_ERROR(500, 600);
 	
-	private int min;
-	private int max;
+	private final int min;
+	private final int max;
 	
 	
-	private HttpStatusClass(int min, int max) {
+	HttpStatusClass(int min, int max) {
 		this.min = min;
 		this.max = max;
 	}
@@ -58,8 +56,11 @@ public enum HttpStatusClass {
 	 * @param response the HTTP response
 	 * @return the status code class of the response
 	 */
-	public static final HttpStatusClass get(HttpResponse response) {
-		int status = WS.getStatus(response);
+	public static HttpStatusClass get(HTTPResponse response) {
+		if (response==null) {
+			return null;
+		}
+		int status = response.getStatus();
 		for (HttpStatusClass clazz : HttpStatusClass.values()) {
 			if ((clazz.min <= status) && (clazz.max > status)) {
 				return clazz;

@@ -1,4 +1,10 @@
 if [ $1 -eq 0 ]; then
-	service cloudconductor-agent stop
-	chkconfig --del cloudconductor-agent
+    which systemctl 2> /dev/null
+    if [ $? -eq 0 ]
+    then
+        systemctl stop cloudconductor-agent.service
+    else
+        service cloudconductor-agent stop
+    fi
+    chkconfig --del cloudconductor-agent
 fi

@@ -1,9 +1,16 @@
 echo "Running post install routine"
 if [ $1 -eq 1 ]; then
-	chkconfig --add cloudconductor-agent
-	chkconfig cloudconductor-agent on
+    chkconfig --add cloudconductor-agent
+    chkconfig cloudconductor-agent on
 fi
 
 if [ $1 -eq 2 ]; then
-	service cloudconductor-agent start
+    which systemctl 2> /dev/null
+    if [ $? -eq 0 ]
+    then
+        systemctl daemon-reload
+        systemctl start cloudconductor-agent.service
+    else
+        service cloudconductor-agent start
+    fi
 fi

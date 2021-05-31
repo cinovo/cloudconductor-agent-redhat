@@ -1,4 +1,4 @@
 echo "Finishing removal"
 if [ $1 -eq 0 ]; then
-	rm -r -f /opt/cloudconductor-agent/
+    rm -r -f /opt/cloudconductor-agent/
 fi
