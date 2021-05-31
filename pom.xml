@@ -57,9 +57,9 @@
 	</contributors>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cloudconductor.api.version>3.2</cloudconductor.api.version>
-		<dvalin.version>1.25</dvalin.version>
-		<jackson.version>2.8.10</jackson.version>
+		<cloudconductor.api.version>3.6-SNAPSHOT</cloudconductor.api.version>
+		<dvalin.version>1.30</dvalin.version>
+		<jackson.version>2.9.10</jackson.version>
 		<serviceName>cloudconductor-agent</serviceName>
 	</properties>
 	<dependencies>
@@ -185,6 +185,18 @@
 							<sources>
 								<source>
 									<location>package/init</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>/usr/lib/systemd/system</directory>
+							<username>root</username>
+							<groupname>root</groupname>
+							<filemode>644</filemode>
+							<directoryIncluded>false</directoryIncluded>
+							<sources>
+								<source>
+									<location>package/systemd</location>
 								</source>
 							</sources>
 						</mapping>

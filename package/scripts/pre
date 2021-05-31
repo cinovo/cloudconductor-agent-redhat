@@ -1,4 +1,10 @@
 echo "Preparing install"
 if [ $1 -eq 2 ]; then
-	service cloudconductor-agent stop
+     which systemctl 2> /dev/null
+     if [ $? -eq 1 ]
+     then
+        service cloudconductor-agent stop
+     else
+        systemctl stop cloudconductor-agent.service
+     fi
 fi
