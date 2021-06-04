@@ -225,9 +225,8 @@ public class AgentState {
 			content = content.replaceAll("TEMPLATE_NAME=", "TEMPLATE_NAME=" + templateName);
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
-			this.logger.error("Failed to write template name to cloudconductor-agent.properties", ex.getMessage());
+			this.logger.error("Failed to write template name to cloudconductor-agent.properties", ex);
 		}
-
 	}
 
 	/**
@@ -254,7 +253,7 @@ public class AgentState {
 			}
 			Files.write(path, content.getBytes(charset));
 		} catch(IOException ex) {
-			this.logger.error("Failed to write uuid to cloudconductor-agent.properties", ex.getMessage());
+			this.logger.error("Failed to write uuid to cloudconductor-agent.properties", ex);
 		}
 	}
 
