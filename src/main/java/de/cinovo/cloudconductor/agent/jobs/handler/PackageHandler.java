@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -50,21 +51,27 @@ public class PackageHandler {
 
 		// report installed packages
 		PackageStateChanges packageChanges = this.reportInstalledPackages();
-		String repoNames  = String.join(",", AgentState.info().getRepos());
-		PackageHandler.LOGGER.debug("Execute changes on repos {}", repoNames);
-
-		// executed package changes for each repository
-		List<PackageVersion> toDelete = packageChanges.getToErase();
-		PackageHandler.LOGGER.debug("Delete: {}", toDelete.toString());
-		List<PackageVersion> toInstall = packageChanges.getToInstall();
-		PackageHandler.LOGGER.debug("Install: {}", toInstall.toString());
-		List<PackageVersion> toUpdate = packageChanges.getToUpdate();
-		PackageHandler.LOGGER.debug("Update: {}", toUpdate.toString());
-		ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoNames, toDelete, toInstall, toUpdate);
-		pkgHandler.execute();
-
-		// re-report installed packages
-		this.reportInstalledPackages();
+		
+		Set<String> repos = AgentState.info().getRepos();
+		if (!repos.isEmpty()) {
+			String repoNames  = String.join(",", repos);
+			PackageHandler.LOGGER.debug("Execute changes on repos {}", repoNames);
+			
+			// executed package changes for each repository
+			List<PackageVersion> toDelete = packageChanges.getToErase();
+			PackageHandler.LOGGER.debug("Delete: {}", toDelete.toString());
+			List<PackageVersion> toInstall = packageChanges.getToInstall();
+			PackageHandler.LOGGER.debug("Install: {}", toInstall.toString());
+			List<PackageVersion> toUpdate = packageChanges.getToUpdate();
+			PackageHandler.LOGGER.debug("Update: {}", toUpdate.toString());
+			ScriptExecutor pkgHandler = ScriptExecutor.generatePackageHandler(repoNames, toDelete, toInstall, toUpdate);
+			pkgHandler.execute();
+			
+			// re-report installed packages
+			this.reportInstalledPackages();
+		} else {
+			PackageHandler.LOGGER.info("No repos in template");
+		}
 
 		PackageHandler.LOGGER.debug("Finished PackageHandler");
 	}

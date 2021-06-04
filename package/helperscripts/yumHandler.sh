@@ -19,7 +19,7 @@ while getopts y:d:i:u: OPT; do
 		u)
 			if [[ ! -z "$OPTARG" ]]; then
 				createArray UPDATE $OPTARG
-			fi 
+			fi
 			;;
 		y)
 			if [[ ! -z "$OPTARG" ]]; then
@@ -27,7 +27,7 @@ while getopts y:d:i:u: OPT; do
 			fi 
 			;;
 		\?)
-			echo "Unknow command!" 1>&2
+			echo "Unknown command!" 1>&2
 			exit 1	
 			;;
     esac
