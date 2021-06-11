@@ -1,14 +1,13 @@
 package de.cinovo.cloudconductor.agent.jobs;
 
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.jobs.handler.ConfigFileHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright 2014 Cinovo AG<br>
@@ -22,7 +21,7 @@ public class FilesJob implements AgentJob {
 	/** the job name, used by scheduler */
 	public static final String JOB_NAME = "FILES_JOB";
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJob.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FilesJob.class);
 	
 	
 	@Override

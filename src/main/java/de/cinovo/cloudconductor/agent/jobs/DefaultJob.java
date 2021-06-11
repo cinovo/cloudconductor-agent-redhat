@@ -20,16 +20,15 @@ package de.cinovo.cloudconductor.agent.jobs;
  * #L%
  */
 
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.jobs.handler.PackageHandler;
 import de.cinovo.cloudconductor.agent.jobs.handler.ServiceHandler;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -51,10 +50,13 @@ public class DefaultJob implements AgentJob {
 		DefaultJob.LOGGER.debug("Started DefaultJob");
 		// only run if no other blocking job is currently running
 		if (AgentState.packageExecutionLock.tryLock()) {
-			this.handlePackages();
-			this.handleServices();
-			AgentState.packageExecutionLock.unlock();
+			try {
+				this.handlePackages();
+			} finally {
+				AgentState.packageExecutionLock.unlock();
+			}
 		}
+		this.handleServices();
 		DefaultJob.LOGGER.debug("Finished DefaultJob");
 	}
 	
@@ -63,7 +65,9 @@ public class DefaultJob implements AgentJob {
 			ServiceHandler serviceHandler = new ServiceHandler();
 			serviceHandler.run();
 		} catch (ExecutionError e) {
-			DefaultJob.LOGGER.error("Error handling services: " + e.getMessage(), e);
+			DefaultJob.LOGGER.warn("Error handling services: " + e.getMessage());
+		} catch (Exception e) {
+			DefaultJob.LOGGER.error("Error handling services: ", e);
 		}
 	}
 	
