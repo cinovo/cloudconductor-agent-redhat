@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class AgentHandler extends AbstractApiHandler {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApiHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AgentHandler.class);
 	
 	
 	/**

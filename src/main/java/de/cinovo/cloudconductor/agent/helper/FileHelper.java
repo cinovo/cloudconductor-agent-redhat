@@ -63,8 +63,9 @@ public class FileHelper {
 	/**
 	 * @param repoToWrite the repository for which a yum repo file should be written
 	 * @throws IOException thrown if file couln't be generated
+	 * @return the file written
 	 */
-	public static void writeYumRepo(Repo repoToWrite) throws IOException {
+	public static File writeYumRepo(Repo repoToWrite) throws IOException {
 		String yumName = repoToWrite.getName();
 		
 		String baseurl = null;
@@ -72,6 +73,7 @@ public class FileHelper {
 		for (RepoMirror mirror : repoToWrite.getMirrors()) {
 			if (mirror.getId().equals(mirrorIndex)) {
 				baseurl = mirror.getPath();
+				break;
 			}
 		}
 		FileHelper.LOGGER.debug("Found baseurl '" + baseurl + "'");
@@ -104,12 +106,12 @@ public class FileHelper {
 			
 			if (checksumFile.equals(checksumString)) {
 				FileHelper.LOGGER.debug("No changes for repo file '" + fileName + "'.");
-				return;
+				return yumRepoFile;
 			}
 		}
 		
-		FileHelper.LOGGER.debug("Write yum repo file '" + fileName + "'...");
-		FileHelper.writeFile(fileName, repoStr.toString());
+		FileHelper.LOGGER.info("Write yum repo file '{}'", fileName);
+		return FileHelper.writeFileAndReturn(fileName, repoStr.toString());
 	}
 	
 	/**
@@ -124,6 +126,21 @@ public class FileHelper {
 			writer.flush();
 			writer.close();
 		}
+	}
+	
+	/**
+	 * @param filePath the path of the file to write
+	 * @param content the string content to write
+	 * @throws IOException thrown if file could not be generated
+	 * @return the file written
+	 */
+	private static File writeFileAndReturn(String filePath, String content) throws IOException {
+		File file = new File(filePath);
+		try (FileWriter writer = new FileWriter(file)) {
+			writer.append(content);
+			writer.flush();
+		}
+		return file;
 	}
 	
 	/**

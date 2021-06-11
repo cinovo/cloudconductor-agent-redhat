@@ -75,15 +75,17 @@ public final class NodeAgent extends DvalinLifecycleAdapter {
 		this.waitForServer();
 
 		// initialize yum repos
-		try {
-			if(AgentState.repoExecutionLock.tryLock()) {
+		if (AgentState.repoExecutionLock.tryLock()) {
+			try {
 				new RepoHandler().run();
+			} catch(ExecutionError e){
+				NodeAgent.LOGGER.error("Error initializing yum repos: ", e);
+				return;
+			} finally{
+				AgentState.repoExecutionLock.unlock();
 			}
-		} catch(ExecutionError e) {
-			NodeAgent.LOGGER.error("Error initializing yum repos: ", e);
-			return;
-		} finally {
-			AgentState.repoExecutionLock.unlock();
+		} else {
+			NodeAgent.LOGGER.error("Could not aquire lock to int yum repos");
 		}
 
 		// start timed jobs
