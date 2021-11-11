@@ -86,8 +86,6 @@ public class FileHelper {
 		
 		repoStr.append("name=" + yumName + " deploy repository");
 		repoStr.append(System.lineSeparator());
-		repoStr.append("failovermethod=priority");
-		repoStr.append(System.lineSeparator());
 		repoStr.append("baseurl=");
 		repoStr.append(baseurl);
 		repoStr.append(System.lineSeparator());
