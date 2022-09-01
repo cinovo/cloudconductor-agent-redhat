@@ -17,6 +17,11 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import de.cinovo.cloudconductor.agent.AgentState;
 import de.cinovo.cloudconductor.agent.exceptions.TransformationErrorException;
 import de.cinovo.cloudconductor.agent.jobs.handler.api.AgentHandler;
@@ -40,12 +45,6 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -152,7 +151,7 @@ public class ServerCom {
 			StringWriter w = new StringWriter();
 			try {
 				Velocity.evaluate(AgentState.vContext(), w, "configfileGen", content);
-			} catch (ParseErrorException | MethodInvocationException | ResourceNotFoundException | IOException e) {
+			} catch (ParseErrorException | MethodInvocationException | ResourceNotFoundException e) {
 				throw new TransformationErrorException("Failed to generate template", e);
 			}
 			return w.toString();

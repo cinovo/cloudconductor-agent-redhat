@@ -20,8 +20,8 @@ package de.cinovo.cloudconductor.agent;
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
 import de.taimos.daemon.DaemonStarter;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.log.Log4JLogChute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -31,6 +31,8 @@ import org.apache.velocity.runtime.log.Log4JLogChute;
  * 
  */
 public final class Starter {
+	
+	private static final Logger logger = LoggerFactory.getLogger(Starter.class);
 	
 	/**
 	 * @param args arguments
@@ -42,15 +44,12 @@ public final class Starter {
 	
 	private static void initVelocity() {
 		try {
-			// Use log4j
-			Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getCanonicalName());
-			Velocity.setProperty("runtime.log.logsystem.log4j.logger", "org.apache.velocity");
 			// Use UTF-8
 			Velocity.setProperty("input.encoding", "UTF-8");
 			Velocity.setProperty("output.encoding", "UTF-8");
 			Velocity.init();
 		} catch (Exception e) {
-			System.err.println("Couldn't start up velocity.");
+			Starter.logger.error("Couldn't start up velocity.");
 			System.exit(1);
 		}
 	}
