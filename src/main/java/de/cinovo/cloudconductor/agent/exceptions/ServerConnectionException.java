@@ -43,11 +43,4 @@ public class ServerConnectionException extends Exception {
 		super();
 	}
 	
-	/**
-	 * @param msg the msg
-	 * @param t the cause
-	 */
-	public ServerConnectionException(String msg, Throwable t) {
-		super(msg, t);
-	}
 }

@@ -25,7 +25,7 @@ public class OptionHandler {
 	@SuppressWarnings("unchecked")
 	public static final Class<AgentJob>[] jobRegistry = new Class[]{DefaultJob.class, AuthorizedKeysJob.class, FilesJob.class, HeartBeatJob.class};
 	private static final Logger LOGGER = LoggerFactory.getLogger(OptionHandler.class);
-	private AgentOption newOptions;
+	private final AgentOption newOptions;
 
 
 	/**
@@ -45,7 +45,7 @@ public class OptionHandler {
 		// option timer
 		if((oldOptions == null) || (this.newOptions.getAliveTimer() != oldOptions.getAliveTimer()) || //
 				(this.newOptions.getAliveTimerUnit() != oldOptions.getAliveTimerUnit())) {
-			OptionHandler.LOGGER.debug("Reseting OPTIONTIMER TO " + this.newOptions.getAliveTimer() + ":" + this.newOptions.getAliveTimerUnit());
+			OptionHandler.LOGGER.debug("Reseting OPTIONTIMER TO {}: {}",this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
 			SchedulerService.instance.resetTask(HeartBeatJob.JOB_NAME, this.newOptions.getAliveTimer(), this.newOptions.getAliveTimerUnit());
 		}
 

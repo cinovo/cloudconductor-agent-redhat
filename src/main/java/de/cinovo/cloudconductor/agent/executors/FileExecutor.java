@@ -20,6 +20,12 @@ package de.cinovo.cloudconductor.agent.executors;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.common.hash.HashCode;
 import com.google.common.io.Files;
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
@@ -30,12 +36,6 @@ import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.ConfigFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -48,9 +48,9 @@ public class FileExecutor implements IExecutor<Set<String>> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileExecutor.class);
 	
-	private Set<ConfigFile> files;
+	private final Set<ConfigFile> files;
 	private StringBuilder errors;
-	private Set<String> restart;
+	private final Set<String> restart;
 	
 	
 	/**
@@ -103,9 +103,9 @@ public class FileExecutor implements IExecutor<Set<String>> {
 				
 				if (!serverFileHash.equals(localFileHash)) {
 					try {
-						FileExecutor.LOGGER.debug("Update config file '" + configFile.getName() + "'...");
+						FileExecutor.LOGGER.debug("Update config file '{}'...", configFile.getName());
 						Files.createParentDirs(localFile);
-						Files.write(serverFile, localFile, Charset.forName("UTF-8"));
+						Files.write(serverFile, localFile, StandardCharsets.UTF_8);
 						changeOccured = true;
 					} catch (IOException e) {
 						// add error to exception list
@@ -147,7 +147,7 @@ public class FileExecutor implements IExecutor<Set<String>> {
 			if (configFile.isReloadable() && changeOccured) {
 				Set<String> servicesToRestart = configFile.getDependentServices();
 				this.restart.addAll(servicesToRestart);
-				FileExecutor.LOGGER.debug("Config file changed, " + servicesToRestart.size() + " services have to be restarted!");
+				FileExecutor.LOGGER.debug("Config file changed, {} services have to be restarted!", servicesToRestart.size());
 			}
 		}
 		

@@ -20,15 +20,6 @@ package de.cinovo.cloudconductor.agent.helper;
  * #L%
  */
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
-import de.cinovo.cloudconductor.api.model.Repo;
-import de.cinovo.cloudconductor.api.model.RepoMirror;
-import de.cinovo.cloudconductor.api.model.SSHKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,6 +34,15 @@ import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collection;
 import java.util.Set;
+
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
+import de.cinovo.cloudconductor.api.model.Repo;
+import de.cinovo.cloudconductor.api.model.RepoMirror;
+import de.cinovo.cloudconductor.api.model.SSHKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -76,7 +76,7 @@ public class FileHelper {
 				break;
 			}
 		}
-		FileHelper.LOGGER.debug("Found baseurl '" + baseurl + "'");
+		FileHelper.LOGGER.debug("Found baseurl '{}'", baseurl);
 		
 		String fileName = AgentVars.YUM_REPO_FOLDER + AgentVars.YUM_REPO_PREFIX + yumName + AgentVars.YUM_REPO_ENDING;
 		
@@ -86,7 +86,7 @@ public class FileHelper {
 		repoStr.append("]");
 		repoStr.append(System.lineSeparator());
 		
-		repoStr.append("name=" + yumName + " deploy repository");
+		repoStr.append("name=").append(yumName).append(" deploy repository");
 		repoStr.append(System.lineSeparator());
 		repoStr.append("baseurl=");
 		repoStr.append(baseurl);
@@ -104,8 +104,8 @@ public class FileHelper {
 			HashCode checksumFile = FileHelper.getChecksum(yumRepoFile);
 			HashCode checksumString = FileHelper.getChecksum(repoStr.toString());
 			
-			if (checksumFile.equals(checksumString)) {
-				FileHelper.LOGGER.debug("No changes for repo file '" + fileName + "'.");
+			if (checksumFile == checksumString) {
+				FileHelper.LOGGER.debug("No changes for repo file '{}'.", fileName);
 				return yumRepoFile;
 			}
 		}
@@ -120,11 +120,10 @@ public class FileHelper {
 	 * @throws IOException thrown if file could not be generated
 	 */
 	public static void writeFile(String filePath, String content) throws IOException {
-		FileHelper.LOGGER.debug("Start to write into file '" + filePath + "'...");
-		try (FileWriter writer = new FileWriter(new File(filePath))) {
+		FileHelper.LOGGER.debug("Start to write into file '{}'...", filePath);
+		try (FileWriter writer = new FileWriter(filePath)) {
 			writer.append(content);
 			writer.flush();
-			writer.close();
 		}
 	}
 	
@@ -163,10 +162,7 @@ public class FileHelper {
 	public static boolean isFileMode(File file, String fileMode) throws IOException {
 		PosixFileAttributeView view = FileHelper.getFileAttributes(file);
 		Set<PosixFilePermission> fileModeSet = PosixFilePermissions.fromString(fileMode);
-		if (view.readAttributes().permissions().equals(fileModeSet)) {
-			return true;
-		}
-		return false;
+		return view.readAttributes().permissions().equals(fileModeSet);
 	}
 	
 	/**
@@ -183,10 +179,7 @@ public class FileHelper {
 		if (!view.readAttributes().owner().getName().equals(owner)) {
 			return false;
 		}
-		if (!view.readAttributes().group().getName().equals(group)) {
-			return false;
-		}
-		return true;
+		return view.readAttributes().group().getName().equals(group);
 	}
 	
 	/**
@@ -235,9 +228,10 @@ public class FileHelper {
 		
 		File folder = new File(folderPath);
 		if (!folder.exists()) {
-			folder.mkdirs();
-			FileHelper.chown(folder, username, username);
-			FileHelper.chmod(folder, FileHelper.akChmodFolder);
+			if(folder.mkdirs()) {
+				FileHelper.chown(folder, username, username);
+				FileHelper.chmod(folder, FileHelper.akChmodFolder);
+			}
 		}
 		
 		File file = new File(folderPath + FileHelper.akFile);
@@ -261,7 +255,7 @@ public class FileHelper {
 		if (!checksumStr.equals(checksumFile)) {
 			FileHelper.writeFile(file.getAbsolutePath(), keyStr.toString());
 		} else {
-			FileHelper.LOGGER.debug("No changes for authorized_keys of user '" + username + "'.");
+			FileHelper.LOGGER.debug("No changes for authorized_keys of user '{}'.", username);
 		}
 	}
 	
@@ -326,7 +320,7 @@ public class FileHelper {
 	 */
 	public static HashCode getChecksum(File content) {
 		try {
-			return Files.hash(content, Hashing.md5());
+			return Files.asByteSource(content).hash(Hashing.md5());
 		} catch (IOException e) {
 			FileHelper.LOGGER.error("Error computing hash: ", e);
 			return null;

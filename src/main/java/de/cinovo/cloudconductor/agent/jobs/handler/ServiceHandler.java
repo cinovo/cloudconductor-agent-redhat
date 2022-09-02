@@ -17,6 +17,11 @@ package de.cinovo.cloudconductor.agent.jobs.handler;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.executors.ScriptExecutor;
 import de.cinovo.cloudconductor.agent.helper.ServerCom;
@@ -26,11 +31,6 @@ import de.cinovo.cloudconductor.api.model.ServiceStates;
 import de.cinovo.cloudconductor.api.model.ServiceStatesChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -63,7 +63,7 @@ public class ServiceHandler {
 		int nStart = serviceChanges.getToStart().size();
 		int nStop = serviceChanges.getToStop().size();
 		int nRestart = serviceChanges.getToRestart().size();
-		ServiceHandler.LOGGER.debug("Service changes: " + nStart + " to be started, " + nStop + " to be stopped, " + nRestart + " to be restarted");
+		ServiceHandler.LOGGER.debug("Service changes: {} to be started, {} to be stopped, {} to be restarted", nStart,nStop, nRestart);
 		
 		// handle service changes
 		ServiceHandler.LOGGER.debug("ServiceHandler: Handle service changes");
@@ -96,7 +96,7 @@ public class ServiceHandler {
 			throw new ExecutionError("Error getting services from server: ", e);
 		}
 		
-		List<String> runningServices = new ArrayList<String>();
+		List<String> runningServices = new ArrayList<>();
 		ScriptExecutor serviceStateHandler = ScriptExecutor.generateCheckServiceState(services);
 		serviceStateHandler.execute();
 		try (Scanner s = new Scanner(serviceStateHandler.getResult())) {
@@ -109,7 +109,7 @@ public class ServiceHandler {
 				}
 			}
 		}
-		ServiceHandler.LOGGER.debug(services.size() + " services registered, " + runningServices.size() + " running.");
+		ServiceHandler.LOGGER.debug("{} services registered, {} running.", services.size(), runningServices.size());
 		
 		return runningServices;
 	}

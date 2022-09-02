@@ -96,7 +96,7 @@ public class ServerCom {
 		try {
 			for (ConfigValue c : ServerCom.config.getConfig(AgentState.info().getTemplate(), AgentVars.SERVICE_NAME)) {
 				if ((c.getService() != null) && c.getService().equals(AgentVars.SERVICE_NAME)) {
-					ServerCom.LOGGER.debug("Add config: " + c.getKey() + ": " + c.getValue());
+					ServerCom.LOGGER.debug("Add config: {}: {}", c.getKey(), c.getValue());
 					configMap.put(c.getKey(), (String) c.getValue());
 				}
 			}

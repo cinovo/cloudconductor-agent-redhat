@@ -33,7 +33,7 @@ import java.util.Scanner;
  */
 public abstract class StreamAnalyzer extends Thread {
 	
-	private InputStream inputStream;
+	private final InputStream inputStream;
 	
 	
 	protected abstract void handleLine(String line);
@@ -43,7 +43,7 @@ public abstract class StreamAnalyzer extends Thread {
 	/**
 	 * @param stream the stream to read
 	 */
-	public StreamAnalyzer(InputStream stream) {
+	StreamAnalyzer(InputStream stream) {
 		this.setDaemon(true);
 		this.inputStream = stream;
 	}

@@ -17,6 +17,8 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
+import java.util.Map;
+
 import de.cinovo.cloudconductor.agent.exceptions.ExecutionError;
 import de.cinovo.cloudconductor.agent.exceptions.ServerConnectionException;
 import de.cinovo.cloudconductor.agent.helper.AgentVars;
@@ -28,6 +30,7 @@ import de.cinovo.cloudconductor.agent.jobs.handler.RepoHandler;
 import de.cinovo.cloudconductor.agent.tasks.SchedulerService;
 import de.cinovo.cloudconductor.api.lib.exceptions.CloudConductorException;
 import de.cinovo.cloudconductor.api.model.Template;
+import de.taimos.daemon.log4j.Log4jDaemonProperties;
 import de.taimos.daemon.properties.FilePropertyProvider;
 import de.taimos.daemon.properties.IPropertyProvider;
 import de.taimos.dvalin.daemon.DvalinLifecycleAdapter;
@@ -95,10 +98,10 @@ public final class NodeAgent extends DvalinLifecycleAdapter {
 				job = jobClazz.newInstance();
 				if(job.isDefaultStart()) {
 					SchedulerService.instance.register(job.getJobIdentifier(), job, job.defaultStartTimer(), job.defaultStartTimerUnit());
-					NodeAgent.LOGGER.info("Registered " + job.getJobIdentifier() + " as defaultstart with " + job.defaultStartTimer() + ":" + job.defaultStartTimerUnit());
+					NodeAgent.LOGGER.info("Registered {} as defaultstart with {}:{}", job.getJobIdentifier(), job.defaultStartTimer(), job.defaultStartTimerUnit());
 				} else {
 					SchedulerService.instance.register(job.getJobIdentifier(), job);
-					NodeAgent.LOGGER.info("Registered " + job.getJobIdentifier());
+					NodeAgent.LOGGER.info("Registered {}", job.getJobIdentifier());
 				}
 			} catch(InstantiationException | IllegalAccessException e) {
 				NodeAgent.LOGGER.error("Couldn't start job: " + jobClazz.getName(), e);
@@ -114,20 +117,14 @@ public final class NodeAgent extends DvalinLifecycleAdapter {
 
 	private void waitForServer() {
 		try {
-			while(!this.checkServer()) {
-				try {
-					Thread.sleep(AgentVars.WAIT_FOR_SERVER);
-				} catch(InterruptedException e) {
-					// just got on
-				}
-			}
+			this.checkServer();
 		} catch(ServerConnectionException e) {
-			NodeAgent.LOGGER.error("The Template " + AgentState.info().getTemplate() + " is not known by the server. I have no work to do. Quitting...");
+			NodeAgent.LOGGER.error("The Template {} is not known by the server. I have no work to do. Quitting...", AgentState.info().getTemplate());
 			System.exit(1);
 		}
 	}
 
-	private boolean checkServer() throws ServerConnectionException {
+	private void checkServer() throws ServerConnectionException {
 		NodeAgent.LOGGER.info("Perform first authentication...");
 		new RefreshJWTJob().run();
 
@@ -136,7 +133,7 @@ public final class NodeAgent extends DvalinLifecycleAdapter {
 		try {
 			Template template = ServerCom.getTemplate();
 			if(template != null) {
-				return true;
+				return;
 			}
 			throw new ServerConnectionException();
 		} catch(CloudConductorException e) {
@@ -148,12 +145,17 @@ public final class NodeAgent extends DvalinLifecycleAdapter {
 	private void assure(String prop, String errorMsg) {
 		if((System.getProperty(prop) == null) || System.getProperty(prop).isEmpty()) {
 			if((System.getenv(prop) == null) || System.getenv(prop).isEmpty()) {
-				System.err.println(errorMsg);
+				this.logger.error(errorMsg);
 				System.exit(1);
 			} else {
 				System.setProperty(prop, System.getenv(prop));
 			}
 		}
 	}
-
+	
+	@Override
+	protected void loadBasicProperties(Map<String, String> map) {
+		super.loadBasicProperties(map);
+		map.put(Log4jDaemonProperties.LOGGER_FILE, "true");
+	}
 }
