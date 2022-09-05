@@ -39,7 +39,7 @@ import de.cinovo.cloudconductor.api.model.Service;
  */
 public class ScriptExecutor extends AbstractExecutor<String> {
 	
-	private Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
 	
 	
 	/**
@@ -135,16 +135,12 @@ public class ScriptExecutor extends AbstractExecutor<String> {
 	}
 	
 	private static String rpmToString(PackageVersion rpm) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(rpm.getName());
-		buffer.append("-");
-		buffer.append(rpm.getVersion());
-		return buffer.toString();
+		return rpm.getName() + "-" + rpm.getVersion();
 	}
 	
 	
-	private String script;
-	private String[] args;
+	private final String script;
+	private final String[] args;
 	private String result;
 	
 	
@@ -178,7 +174,7 @@ public class ScriptExecutor extends AbstractExecutor<String> {
 			}
 		}
 		
-		this.LOGGER.debug("Execute '" + scriptBuilder.toString() + "'");
+		this.LOGGER.debug("Execute '{}'", scriptBuilder);
 		
 		return Runtime.getRuntime().exec(scriptBuilder.toString());
 	}

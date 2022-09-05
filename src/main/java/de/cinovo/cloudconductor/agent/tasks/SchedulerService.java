@@ -1,14 +1,14 @@
 package de.cinovo.cloudconductor.agent.tasks;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copyright 2014 Cinovo AG<br>
@@ -97,7 +97,7 @@ public class SchedulerService {
 	 * @param unit the new unit
 	 */
 	public void resetTask(String identifier, long period, TimeUnit unit) {
-		SchedulerService.LOGGER.debug("Resetting Task '" + identifier + "'");
+		SchedulerService.LOGGER.debug("Resetting Task '{}'", identifier);
 		if (!this.tasks.containsKey(identifier)) {
 			throw new RuntimeException("Unknown task: '" + identifier + "'");
 		}
