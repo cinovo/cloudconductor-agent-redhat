@@ -104,7 +104,7 @@ public class FileHelper {
 			HashCode checksumFile = FileHelper.getChecksum(yumRepoFile);
 			HashCode checksumString = FileHelper.getChecksum(repoStr.toString());
 			
-			if (checksumFile == checksumString) {
+			if (checksumString.equals(checksumFile)) {
 				FileHelper.LOGGER.debug("No changes for repo file '{}'.", fileName);
 				return yumRepoFile;
 			}
