@@ -23,8 +23,8 @@
 		</license>
 	</licenses>
 	<ciManagement>
-		<system>Travis</system>
-		<url>https://travis-ci.org/cinovo/cloudconductor-agent-redhat</url>
+		<system>GitHub Actions</system>
+		<url>https://github.com/cinovo/cloudconductor-agent-redhat/actions</url>
 	</ciManagement>
 	<issueManagement>
 		<system>Github</system>
