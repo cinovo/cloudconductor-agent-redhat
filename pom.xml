@@ -58,8 +58,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cloudconductor.api.version>3.7</cloudconductor.api.version>
-		<dvalin.version>1.32</dvalin.version>
-		<jackson.version>2.12.6</jackson.version>
+		<dvalin.version>1.33</dvalin.version>
+		<jackson.version>2.14.0</jackson.version>
 		<velocity.version>2.3</velocity.version>
 		<serviceName>cloudconductor-agent</serviceName>
 	</properties>
@@ -72,7 +72,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-			<version>4.3.30.RELEASE</version>
+			<version>5.3.23</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.15</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
@@ -89,10 +94,22 @@
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>9.20</version>
         </dependency>
+		<!-- TODO Release and update cloudconductor-api to match jackson version -->
 		<dependency>
 			<groupId>de.cinovo.cloudconductor</groupId>
 			<artifactId>cloudconductor-api</artifactId>
 			<version>${cloudconductor.api.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
