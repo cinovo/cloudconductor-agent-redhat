@@ -17,6 +17,13 @@ package de.cinovo.cloudconductor.agent;
  * #L%
  */
 
+import de.cinovo.cloudconductor.agent.helper.AgentVars;
+import de.cinovo.cloudconductor.api.model.AgentOption;
+import de.taimos.daemon.DaemonStarter;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -28,13 +35,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import de.cinovo.cloudconductor.agent.helper.AgentVars;
-import de.cinovo.cloudconductor.api.model.AgentOption;
-import de.taimos.daemon.DaemonStarter;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Copyright 2013 Cinovo AG<br>
@@ -208,21 +208,21 @@ public class AgentState {
 	}
 	
 	/**
-	 * updates the templatename
-	 *
-	 * @param templateName the name of the template
+	 * @param newTemplate the name of the template
 	 */
-	public void updateTemplate(String templateName) {
-		Charset charset = StandardCharsets.UTF_8;
-		if (this.getTemplate().equals(templateName)) {
+	public void updateTemplate(String newTemplate) {
+		String oldTemplate = this.getTemplate();
+		if (oldTemplate.equals(newTemplate)) {
 			return;
 		}
-		System.setProperty(AgentVars.TEMPLATE_PROP, templateName);
+		
+		System.setProperty(AgentVars.TEMPLATE_PROP, newTemplate);
 		try {
 			Path path = Paths.get("/opt/cloudconductor-agent/cloudconductor-agent.properties");
 			
+			Charset charset = StandardCharsets.UTF_8;	
 			String content = new String(Files.readAllBytes(path), charset);
-			content = content.replaceAll("TEMPLATE_NAME=", "TEMPLATE_NAME=" + templateName);
+			content = content.replace(AgentVars.TEMPLATE_PROP + "=" + oldTemplate, AgentVars.TEMPLATE_PROP + "=" + newTemplate);
 			Files.write(path, content.getBytes(charset));
 		} catch (IOException ex) {
 			this.logger.error("Failed to write template name to cloudconductor-agent.properties", ex);
