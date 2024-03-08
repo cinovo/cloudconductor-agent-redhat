@@ -3,7 +3,7 @@
 
     <groupId>de.cinovo.cloudconductor</groupId>
     <artifactId>cloudconductor-agent-redhat</artifactId>
-    <version>3.11</version>
+    <version>3.12-SNAPSHOT</version>
     <name>Node Agent for cloudconductor framework</name>
     <description>Node Agent for cloudconductor framework</description>
     <url>https://github.com/cinovo/cloudconductor-agent-redhat</url>
@@ -29,7 +29,7 @@
     <scm>
         <connection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</connection>
         <developerConnection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</developerConnection>
-        <tag>v3.11</tag>
+        <tag>HEAD</tag>
     </scm>
     <repositories>
         <repository>
