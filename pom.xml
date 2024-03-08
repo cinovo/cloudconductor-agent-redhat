@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.cinovo.cloudconductor</groupId>
     <artifactId>cloudconductor-agent-redhat</artifactId>
-    <version>3.11-SNAPSHOT</version>
+    <version>3.11</version>
     <name>Node Agent for cloudconductor framework</name>
     <description>Node Agent for cloudconductor framework</description>
     <url>https://github.com/cinovo/cloudconductor-agent-redhat</url>
@@ -30,7 +29,7 @@
     <scm>
         <connection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</connection>
         <developerConnection>scm:git:git@github.com:cinovo/cloudconductor-agent-redhat.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v3.11</tag>
     </scm>
     <repositories>
         <repository>
@@ -173,7 +172,7 @@
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
-                                    <ignore/>
+                                    <ignore />
                                 </action>
                             </pluginExecution>
                         </pluginExecutions>
@@ -435,7 +434,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
